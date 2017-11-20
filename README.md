@@ -29,6 +29,7 @@ _*Only Client to Client / no Traffic Gateway_
 
 _Tested with Call of Duty WWII & other Games under Windows 7 / 10 / 8.1_
 
+## ![Changelogs](Changelog.md)
 
 ## Installation
 1. Install as Admin
