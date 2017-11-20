@@ -2,6 +2,8 @@
 
 Build with Autoit & host in EU
 
+![Screenshot](res/client.png)
+
 ## Features
 - Play Games with LAN mode
 - Share private files
@@ -27,7 +29,6 @@ _*Only Client to Client / no Traffic Gateway_
 
 _Tested with Call of Duty WWII & other Games under Windows 7 / 10 / 8.1_
 
-[Screenshot](res/client.png)
 
 ## Installation
 1. Install as Admin
