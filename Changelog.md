@@ -31,3 +31,10 @@
 - Correct Adapter renaming tested with Win7/10
 - Setup progress changed / correction
 - VPN IP determined over highest Metric
+
+### Version 1.8
+- Chat including Part #1
+
+### Version 1.9
+- Chat including Part #2 (in TrayMenu)
+- Bugfixes
