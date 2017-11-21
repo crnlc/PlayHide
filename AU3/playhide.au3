@@ -157,21 +157,31 @@ $link = GUICtrlCreateLabel("Vers: " & $ReadVersion & " / Website", 10, 150, 300,
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+       Local $iStatus = TrayCreateItem("Not Connected")
+TrayItemSetState ($iStatus, $TRAY_DISABLE)
+TrayCreateItem("") ; Create a separator line.
        Local $iOpen = TrayCreateItem("Open")
 	   Local $iOpenChat = TrayCreateItem("Chat")
-    #Local $iAutoConnect = TrayCreateItem("AutoConnect", $AutoConnectSetting)
+	   TrayCreateItem("") ; Create a separator line.
+    Local $iAutoConnect = TrayCreateItem("Auto-Connect", -1, -1, $TRAY_ITEM_NORMAL)
+   Local $iAutoMinimize = TrayCreateItem("Auto-Minimize", -1, -1, $TRAY_ITEM_NORMAL)
+		 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
     TrayCreateItem("") ; Create a separator line.
+   Local $iWebsite = TrayCreateItem("Vers: " & $ReadVersion & " / Website", -1, -1, $TRAY_ITEM_NORMAL)
     Local $idExit = TrayCreateItem("Exit")
 GUISetState(@SW_SHOW)
 
       Local $SettingsFile = @ScriptDir & "\Settings.ini"
 	  $StartMin = IniRead($SettingsFile, "Settings", "StartMin", "")
 If $StartMin >0 then
+   		 TrayItemSetState ($iAutoMinimize, $TRAY_CHECKED)
    			   TraySetState(1)
 			   GUISetState(@SW_HIDE, $Form1)
-			   else
+			else
+			   		 TrayItemSetState ($iAutoMinimize, $TRAY_UNCHECKED)
 $AutoConnectSetting = IniRead($SettingsFile, "Settings", "AutoConnect", "")
 If $AutoConnectSetting >0 then
+		 TrayItemSetState ($iAutoConnect, $TRAY_CHECKED)
 		 Run(@ComSpec & " /c " & "bin32\openvpn.exe .\config\client.ovpn" , "", @SW_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
 		 GUICtrlSetState($LabelNotConnected, $GUI_HIDE)
@@ -185,7 +195,10 @@ Local $sData = 'IP: ' & $aArray[1]
 		 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 		 GUICtrlSetColor(-1, 0xFFFFFF)
 		 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+		 TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
 	  Else
+		 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
+		 TrayItemSetText($iStatus, "Not Connected")
 		 ProcessClose("openvpn.exe")
 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
@@ -242,6 +255,7 @@ Local $sData = 'IP: ' & $aArray[1]
 	  Local $LabelShowIP = GUICtrlCreateLabel($sData, 150, 150, 300, 30)
 				If ProcessExists("openvpn.exe") And Ping("10.5.1.1",400) Then
 			       Local $sData = 'IP: ' & $aArray[1]
+				   TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
 		 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 		 GUICtrlSetColor(-1, 0xFFFFFF)
 		 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -251,6 +265,7 @@ GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
 GUICtrlSetState($LabelShowIP, $GUI_HIDE)
 GUICtrlSetState($LabelNotConnected, $GUI_SHOW)
+TrayItemSetText($iStatus, "Not Connected")
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -264,6 +279,7 @@ EndIf
 						GUICtrlSetState($LabelShowIP, $GUI_HIDE)
 						GUICtrlSetState($ButtonChat, $GUI_HIDE)
 				 		 GUICtrlSetState($LabelNotConnected, $GUI_SHOW)
+						 TrayItemSetText($iStatus, "Not Connected")
 			 		  EndSwitch
         Switch TrayGetMsg()
             Case $idExit
@@ -278,8 +294,36 @@ else
    		   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
     _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "Chat is already running!")
 				_GUIDisable($Form1)
-				EndIf
+			 EndIf
+		  Case $iWebsite
+			             ShellExecute("http://playhide.tk")
+		  Case $iAutoMinimize
+If $StartMin >0 then
+   	   IniWrite($SettingsFile, "Settings", "StartMin", "0")
+	   			   _GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+			   _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Auto Minimize is off! (Change after Restart)")
+				_GUIDisable($Form1)
+	else
+	  IniWrite($SettingsFile, "Settings", "StartMin", "1")
+	  	   			   _GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+			   _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Auto Minimize is on! (Change after Restart)")
+				_GUIDisable($Form1)
+EndIf
+
+		  Case $iAutoConnect
+			 if $AutoConnectSetting >0 Then
+			   IniWrite($SettingsFile, "Settings", "AutoConnect", "0")
+			   _GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+			   _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Auto Connect is off! (Change after Restart)")
+				_GUIDisable($Form1)
+			 else
+				 IniWrite($SettingsFile, "Settings", "AutoConnect", "1")
+				 			      		   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+    _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Auto Connect is on! (Change after Restart)")
+				_GUIDisable($Form1)
+EndIf
    Case $iOpen
+
 ConsoleWrite("up" & @CRLF)
 $ok = GUISetState(@SW_SHOW)
 ConsoleWrite($ok & @CRLF)
