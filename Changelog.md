@@ -39,5 +39,5 @@
 - Chat including Part #2 (in TrayMenu)
 - Bugfixes
 
-### Version 1.9
+### Version 2.0
 - More Tray Menu like Auto-Connect / Auto-Minimize / Connection Status
