@@ -1,4 +1,4 @@
-DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1) ; This disables 32bit applications from being redirected to syswow64 instead of system32 by default ;
+DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
 #AutoIt3Wrapper_Run_Au3Stripper=y
 #Au3Stripper_Parameters=/so /rm /pe
 #Au3Stripper_Ignore_Funcs=_iHoverOn,_iHoverOff,_iFullscreenToggleBtn,_cHvr_CSCP_X64,_cHvr_CSCP_X86,_iControlDelete
@@ -17,7 +17,7 @@ DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1) ; Thi
 #include <GuiButton.au3>
 #RequireAdmin
 #traymenu()
-_Metro_EnableHighDPIScaling() ; Note: Requries "#AutoIt3Wrapper_Res_HiDpi=y" for compiling. To see visible changes without compiling, you have to disable dpi scaling in compatibility settings of Autoit3.exe
+_Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
 TraySetState(16)
 TraySetToolTip ("PlayHide Service")
@@ -43,7 +43,7 @@ EndFunc
 
 Func _IPDetails()
     Local $oWMIService = ObjGet('winmgmts:{impersonationLevel = impersonate}!\\' & '.' & '\root\cimv2')
-    Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where IPEnabled = True', 'WQL', 0x30), $aReturn[5] = [0]
+    Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where IPConnectionMetric=1', 'WQL', 0x30), $aReturn[5] = [0]
     If IsObj($oColItems) Then
         For $oObjectItem In $oColItems
             If $oObjectItem.IPAddress(0) == @IPAddress1 Then
@@ -137,7 +137,7 @@ GUICtrlCreateLabel("PlayHide VPN", 10, 10, 300, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-Local $offline = GUICtrlCreateLabel("Not connected", 150, 150, 300, 30)
+Local $LabelNotConnected = GUICtrlCreateLabel("Not connected", 150, 150, 300, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -145,57 +145,60 @@ $link = GUICtrlCreateLabel("PlayHide VPN", 65, 40, 300, 30)
 GUICtrlSetFont(-1, 14, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-$Button2 = _Metro_CreateButton("Connect", 70, 85, 99, 50, 0xFF7500)
- _GUICtrlButton_Click($Button2)
-$Button7 = _Metro_CreateButton("Disconnect", 70, 85, 99, 50, 0xFF7500)
-$Button3 = _Metro_CreateButton("Close", 20, 150, 99, 25)
-$Button5 = _Metro_CreateButton("IP", 125, 150, 99, 25)
-$Button6 = _Metro_CreateButton("Setup / Install Driver", 70, 190, 99, 45)
-GUICtrlSetState($Button6, $GUI_HIDE)
-GUICtrlSetState($Button7, $GUI_HIDE)
-GUICtrlSetState($Button5, $GUI_HIDE)
-GUICtrlSetState($Button3, $GUI_HIDE)
+$ButtonConnect = _Metro_CreateButton("Connect", 70, 85, 99, 50, 0xFF7500)
+ _GUICtrlButton_Click($ButtonConnect)
+$ButtonDisconnect = _Metro_CreateButton("Disconnect", 70, 85, 99, 50, 0xFF7500)
+$ButtonChat = _Metro_CreateButton("Chat", 70, 115, 99, 25)
+GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
+GUICtrlSetState($ButtonChat, $GUI_HIDE)
 $UpdaterVersionFile = @ScriptDir & "\updater.ini"
 $ReadVersion = IniRead($UpdaterVersionFile, "Version", "Version", "")
 $link = GUICtrlCreateLabel("Vers: " & $ReadVersion & " / Website", 10, 150, 300, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+       Local $iStatus = TrayCreateItem("Not Connected")
+TrayItemSetState ($iStatus, $TRAY_DISABLE)
+TrayCreateItem("") ; Create a separator line.
        Local $iOpen = TrayCreateItem("Open")
-   #Local $iWebsite = TrayCreateItem("Website")
-    #Local $iAutoConnect = TrayCreateItem("AutoConnect", $AutoConnectSetting)
+	   Local $iOpenChat = TrayCreateItem("Chat")
+	   TrayCreateItem("") ; Create a separator line.
+    Local $iAutoConnect = TrayCreateItem("Auto-Connect", -1, -1, $TRAY_ITEM_NORMAL)
+			 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
+   Local $iAutostart = TrayCreateItem("Autostart (Systemboot)")
     TrayCreateItem("") ; Create a separator line.
+   Local $iWebsite = TrayCreateItem("Vers: " & $ReadVersion & " / Website", -1, -1, $TRAY_ITEM_NORMAL)
     Local $idExit = TrayCreateItem("Exit")
-#Run(@ComSpec & " /c " & 'netsh interface set interface "PlayHide VPN" DISABLED' , "", @SW_HIDE)
 GUISetState(@SW_SHOW)
 
       Local $SettingsFile = @ScriptDir & "\Settings.ini"
-	  $StartMin = IniRead($SettingsFile, "Settings", "StartMin", "")
-If $StartMin >0 then
-   			   TraySetState(1)
-			   GUISetState(@SW_HIDE, $Form1)
-			   else
 $AutoConnectSetting = IniRead($SettingsFile, "Settings", "AutoConnect", "")
 If $AutoConnectSetting >0 then
+		 TrayItemSetState ($iAutoConnect, $TRAY_CHECKED)
 		 Run(@ComSpec & " /c " & "bin32\openvpn.exe .\config\client.ovpn" , "", @SW_HIDE)
-		 GUICtrlSetState($Button2, $GUI_HIDE)
-		 GUICtrlSetState($offline, $GUI_HIDE)
-		 GUICtrlSetState($Button7, $GUI_SHOW)
+		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
+		 GUICtrlSetState($LabelNotConnected, $GUI_HIDE)
+		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
+		 TraySetState(1)
+		 GUISetState(@SW_HIDE, $Form1)
       Sleep(5000)
    Local $aArray = _IPDetails()
 Local $sData = 'IP: ' & $aArray[1]
-	  Local $IP = GUICtrlCreateLabel($sData, 150, 150, 300, 30)
+	  Local $LabelShowIP = GUICtrlCreateLabel($sData, 150, 150, 300, 30)
 				If ProcessExists("openvpn.exe") And Ping("10.5.1.1",400) Then
 			       Local $sData = 'IP: ' & $aArray[1]
 		 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 		 GUICtrlSetColor(-1, 0xFFFFFF)
 		 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+		 TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
 	  Else
+		 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
+		 TrayItemSetText($iStatus, "Not Connected")
 		 ProcessClose("openvpn.exe")
-GUICtrlSetState($Button7, $GUI_HIDE)
-GUICtrlSetState($Button2, $GUI_SHOW)
-GUICtrlSetState($IP, $GUI_HIDE)
-GUICtrlSetState($offline, $GUI_SHOW)
+GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
+GUICtrlSetState($ButtonConnect, $GUI_SHOW)
+GUICtrlSetState($LabelShowIP, $GUI_HIDE)
+GUICtrlSetState($LabelNotConnected, $GUI_SHOW)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -206,7 +209,6 @@ EndIf
    else
    EndIf
    EndIf
-EndIf
 EndIf
 EndIf
 EndIf
@@ -236,27 +238,29 @@ While 1
 			Case $link
             ShellExecute("http://playhide.tk")
 
-		 Case $Button2
-		 #Run(@ComSpec & " /c " & 'netsh interface set interface "PlayHide VPN" ENABLED' , "", @SW_HIDE)
+		 Case $ButtonConnect
 		 Run(@ComSpec & " /c " & "bin32\openvpn.exe .\config\client.ovpn" , "", @SW_HIDE)
-		 GUICtrlSetState($Button2, $GUI_HIDE)
-		 GUICtrlSetState($offline, $GUI_HIDE)
-		 GUICtrlSetState($Button7, $GUI_SHOW)
+		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
+		 GUICtrlSetState($LabelNotConnected, $GUI_HIDE)
+		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
       Sleep(5000)
    Local $aArray = _IPDetails()
 Local $sData = 'IP: ' & $aArray[1]
-	  Local $IP = GUICtrlCreateLabel($sData, 150, 150, 300, 30)
+	  Local $LabelShowIP = GUICtrlCreateLabel($sData, 150, 150, 300, 30)
 				If ProcessExists("openvpn.exe") And Ping("10.5.1.1",400) Then
 			       Local $sData = 'IP: ' & $aArray[1]
+				   TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
+				  TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
 		 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 		 GUICtrlSetColor(-1, 0xFFFFFF)
 		 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 	  Else
 		 ProcessClose("openvpn.exe")
-GUICtrlSetState($Button7, $GUI_HIDE)
-GUICtrlSetState($Button2, $GUI_SHOW)
-GUICtrlSetState($IP, $GUI_HIDE)
-GUICtrlSetState($offline, $GUI_SHOW)
+GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
+GUICtrlSetState($ButtonConnect, $GUI_SHOW)
+GUICtrlSetState($LabelShowIP, $GUI_HIDE)
+GUICtrlSetState($LabelNotConnected, $GUI_SHOW)
+TrayItemSetText($iStatus, "Not Connected")
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -264,45 +268,13 @@ GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
     _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "No Connection to Network")
 				_GUIDisable($Form1)
 EndIf
-		         Case $Button7
+		         Case $ButtonDisconnect
 		 ProcessClose("openvpn.exe")
-		 		 GUICtrlSetState($Button2, $GUI_SHOW)
-						GUICtrlSetState($IP, $GUI_HIDE)
-				 		 GUICtrlSetState($offline, $GUI_SHOW)
-
-        Case $Button3
-		 ProcessClose("openvpn.exe")
-		 _Metro_GUIDelete($Form1)
-		 Exit
-	  Case $Button6
-			$Setup = _Metro_MsgBox(4, "Info", "Do you want to Setup?")
-If $Setup = "Yes" Then
-			Local $file = FileOpen("login.txt", 2)
-			FileFlush($file)
-			FileWrite($file, _RandomText(10) & @CRLF)
-			FileWrite($file, _RandomText(10))
-			FileClose($file)
-			Run(@ComSpec & " /c " & "install.cmd" , "", @SW_HIDE)
-			Exit
-			ElseIf $Setup = "No" Then
-
-EndIf
-
-
-		 Case $Button5
-			If ProcessExists("openvpn.exe") Then
-			Local $aArray = _IPDetails()
-If @error = 0 Then
-    Local $sData = 'VPN IP is: ' & $aArray[1]
-	   			_GUIDisable($Form1, 0, 30)
-    _Metro_MsgBox($MB_SYSTEMMODAL, '', $sData)
-					_GUIDisable($Form1)
- EndIf
-Else
-   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
-    _Metro_MsgBox($MB_SYSTEMMODAL, "IP", "VPN not connected!")
-				_GUIDisable($Form1)
-			 EndIf
+		 		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
+						GUICtrlSetState($LabelShowIP, $GUI_HIDE)
+						GUICtrlSetState($ButtonChat, $GUI_HIDE)
+				 		 GUICtrlSetState($LabelNotConnected, $GUI_SHOW)
+						 TrayItemSetText($iStatus, "Not Connected")
 			 		  EndSwitch
         Switch TrayGetMsg()
             Case $idExit
@@ -310,15 +282,40 @@ Else
 		 _Metro_GUIDelete($Form1)
 		 Exit
 
+	  Case $iOpenChat
+			if Not ProcessExists("chat.exe") then
+			run("bin32\chat.exe")
+			else
+   		   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+    _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "Chat is already running!")
+				_GUIDisable($Form1)
+			 EndIf
+
+		  Case $iWebsite
+			             ShellExecute("http://playhide.tk")
+
+		 Case $iAutostart
+			FileCreateShortcut(@AutoItExe, @StartupDir & "\" & @ScriptName & ".lnk", @ScriptDir) ;für den aktuellen Benutzer
+			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+			_Metro_MsgBox($MB_SYSTEMMODAL, "Info", "PlayHide is now StartUp with your System!")
+			_GUIDisable($Form1)
+
+		  Case $iAutoConnect
+			 if $AutoConnectSetting >0 Then
+			   IniWrite($SettingsFile, "Settings", "AutoConnect", "0")
+			   _GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+			   _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Auto Connect is off! (Change after Restart)")
+				_GUIDisable($Form1)
+			 else
+				 IniWrite($SettingsFile, "Settings", "AutoConnect", "1")
+				 			      		   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+    _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Auto Connect is on! (Change after Restart)")
+				_GUIDisable($Form1)
+EndIf
    Case $iOpen
+
 ConsoleWrite("up" & @CRLF)
 $ok = GUISetState(@SW_SHOW)
 ConsoleWrite($ok & @CRLF)
 	  EndSwitch
-
-#If TrayGetMsg()==$TRAY_EVENT_PRIMARYUP Then
-#ConsoleWrite("up" & @CRLF)
-#$ok = GUISetState(@SW_SHOW)
-#ConsoleWrite($ok & @CRLF)
-#EndIf
 WEnd
