@@ -41,3 +41,6 @@
 
 ### Version 2.0
 - More Tray Menu like Auto-Connect / Auto-Minimize / Connection Status
+
+### Version 2.1
+- Auto-Connect start in Tray / Autostart at Systemboot possible (new Traymenu)
