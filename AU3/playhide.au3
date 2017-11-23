@@ -295,11 +295,17 @@ EndIf
 			             ShellExecute("http://playhide.tk")
 
 		 Case $iAutostart
-			FileCreateShortcut(@AutoItExe, @StartupDir & "\" & @ScriptName & ".lnk", @ScriptDir) ;für den aktuellen Benutzer
+			if Not FileExists(@StartupDir & "\PlayHide.lnk") Then
+			FileCreateShortcut(@AutoItExe, @StartupDir & "\PlayHide.lnk", @ScriptDir) ;für den aktuellen Benutzer
 			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
 			_Metro_MsgBox($MB_SYSTEMMODAL, "Info", "PlayHide is now StartUp with your System!")
 			_GUIDisable($Form1)
-
+		 else
+			FileDelete(@StartupDir & "\PlayHide.lnk")
+			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+			_Metro_MsgBox($MB_SYSTEMMODAL, "Info", "PlayHide is removed as Autostart!")
+			_GUIDisable($Form1)
+			EndIf
 		  Case $iAutoConnect
 			 if $AutoConnectSetting >0 Then
 			   IniWrite($SettingsFile, "Settings", "AutoConnect", "0")

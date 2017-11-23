@@ -44,3 +44,6 @@
 
 ### Version 2.1
 - Auto-Connect start in Tray / Autostart at Systemboot possible (new Traymenu)
+
+### Version 2.2
+- Trigger Autostart if exist or not else add or remove Service
