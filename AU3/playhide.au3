@@ -115,6 +115,10 @@ If Not FileExists("login.txt") then
 			RunWait('netsh interface ipv4 set interface "PlayHide VPN" metric=1')
 			ProcessClose("openvpn.exe")
 			_Metro_MsgBox($MB_SYSTEMMODAL, "Finish", "Setup is finish! Now start PlayHide again!")
+			if Not FileExists(@DesktopDir & "\PlayHide VPN.lnk") Then
+			FileCreateShortcut(@AutoItExe, @DesktopDir & "\PlayHide VPN.lnk", @ScriptDir)
+		 else
+			EndIf
 			Exit
 		 else
 			    _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "No Connection to Network")
@@ -166,6 +170,7 @@ TrayCreateItem("") ; Create a separator line.
     Local $iAutoConnect = TrayCreateItem("Auto-Connect", -1, -1, $TRAY_ITEM_NORMAL)
 			 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
    Local $iAutostart = TrayCreateItem("Autostart (Systemboot)")
+   Local $iDesktopIcon = TrayCreateItem("Desktop Shortcut")
     TrayCreateItem("") ; Create a separator line.
    Local $iWebsite = TrayCreateItem("Vers: " & $ReadVersion & " / Website", -1, -1, $TRAY_ITEM_NORMAL)
     Local $idExit = TrayCreateItem("Exit")
@@ -294,7 +299,19 @@ EndIf
 		  Case $iWebsite
 			             ShellExecute("http://playhide.tk")
 
-		 Case $iAutostart
+		 Case $iDesktopIcon
+			if Not FileExists(@DesktopDir & "\PlayHide VPN.lnk") Then
+			FileCreateShortcut(@AutoItExe, @DesktopDir & "\PlayHide VPN.lnk", @ScriptDir) ;für den aktuellen Benutzer
+			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+			_Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Shortcut created!")
+			_GUIDisable($Form1)
+					 else
+			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+			_Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Shortcut already exist!")
+			_GUIDisable($Form1)
+		 EndIf
+
+					 Case $iAutostart
 			if Not FileExists(@StartupDir & "\PlayHide.lnk") Then
 			FileCreateShortcut(@AutoItExe, @StartupDir & "\PlayHide.lnk", @ScriptDir) ;für den aktuellen Benutzer
 			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.

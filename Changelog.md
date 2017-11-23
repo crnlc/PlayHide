@@ -47,3 +47,4 @@
 
 ### Version 2.2
 - Trigger Autostart if exist or not else add or remove Service
+- Desktop shortcut creation
