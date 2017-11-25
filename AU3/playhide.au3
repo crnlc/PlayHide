@@ -104,6 +104,8 @@ If Not FileExists("login.txt") then
 			FileWrite($file, _RandomText(10) & @CRLF)
 			FileWrite($file, _RandomText(10))
 			FileClose($file)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="PlayHide VPN" dir=in action=allow protocol=UDP localport=1400' , "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
 			$Setup = _Metro_MsgBox(0, "First run", "Setup required! Takes 30 Sec after TAP Installer")
 			#RunWait(@ComSpec & " /c " & '"' & @ScriptDir & '\driver\tapinstall.exe" install ' & '"' & @ScriptDir & '\driver\OemVista.inf" tap0901')
 			RunWait('driver\tap.exe')
