@@ -49,5 +49,5 @@
 - Trigger Autostart if exist or not else add or remove Service
 - Desktop shortcut creation
 - Fixed Firewall Access (Windows)
-- Hide Desktop TrayMenu if Desktop shortcut already exist
+- Hide TrayMenuItem Desktop shortcut creation if Desktop shortcut already exist
 - Enable or Disable Chat in Settings.ini
