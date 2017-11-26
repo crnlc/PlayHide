@@ -51,3 +51,7 @@
 - Fixed Firewall Access (Windows)
 - Disable TrayMenuItem Desktop shortcut creation if Desktop shortcut already exist
 - Enable or Disable Chat in Settings.ini
+
+### Version 2.3
+- Smooth Button
+- Fixed UI Trigger when AutoConnect is active
