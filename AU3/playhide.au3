@@ -133,7 +133,9 @@ else
 If ProcessExists("openvpn.exe") Then
        _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "Only one Connection possible!")
    Exit
-   else
+else
+Local $SettingsFile = @ScriptDir & "\Settings.ini"
+$ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 $Form1 = _Metro_CreateGUI("PlayHide by 3DNS", 250, 180, -1, -1, true,false)
 $Control_Buttons = _Metro_AddControlButtons(True,False,True,False,False)
 $GUI_CLOSE_BUTTON = $Control_Buttons[0]
@@ -168,17 +170,27 @@ TrayItemSetState ($iStatus, $TRAY_DISABLE)
 TrayCreateItem("") ; Create a separator line.
        Local $iOpen = TrayCreateItem("Open")
 	   Local $iOpenChat = TrayCreateItem("Chat")
+	   If $ChatSetting >0 then
+			 TrayItemSetState ($iOpenChat, $TRAY_ENABLE)
+	Else
+	   		 TrayItemSetState ($iOpenChat, $TRAY_DISABLE)
+EndIf
+
 	   TrayCreateItem("") ; Create a separator line.
     Local $iAutoConnect = TrayCreateItem("Auto-Connect", -1, -1, $TRAY_ITEM_NORMAL)
 			 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
    Local $iAutostart = TrayCreateItem("Autostart (Systemboot)")
    Local $iDesktopIcon = TrayCreateItem("Desktop Shortcut")
+   if FileExists(@DesktopDir & "\PlayHide VPN.lnk") Then
+			TrayItemSetState ($iDesktopIcon, $TRAY_DISABLE)
+			Else
+			TrayItemSetState ($iDesktopIcon, $TRAY_ENABLE)
+			EndIf
     TrayCreateItem("") ; Create a separator line.
    Local $iWebsite = TrayCreateItem("Vers: " & $ReadVersion & " / Website", -1, -1, $TRAY_ITEM_NORMAL)
     Local $idExit = TrayCreateItem("Exit")
 GUISetState(@SW_SHOW)
 
-      Local $SettingsFile = @ScriptDir & "\Settings.ini"
 $AutoConnectSetting = IniRead($SettingsFile, "Settings", "AutoConnect", "")
 If $AutoConnectSetting >0 then
 		 TrayItemSetState ($iAutoConnect, $TRAY_CHECKED)
@@ -198,6 +210,7 @@ Local $sData = 'IP: ' & $aArray[1]
 		 GUICtrlSetColor(-1, 0xFFFFFF)
 		 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 		 TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
+		 TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
 	  Else
 		 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
 		 TrayItemSetText($iStatus, "Not Connected")
