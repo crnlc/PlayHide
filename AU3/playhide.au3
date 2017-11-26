@@ -153,9 +153,9 @@ $link = GUICtrlCreateLabel("PlayHide VPN", 65, 40, 300, 30)
 GUICtrlSetFont(-1, 14, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-$ButtonConnect = _Metro_CreateButton("Connect", 70, 85, 99, 50, 0xFF7500)
+$ButtonConnect = _Metro_CreateButtonEx2("Connect", 70, 85, 99, 50, 0xFF7500)
  _GUICtrlButton_Click($ButtonConnect)
-$ButtonDisconnect = _Metro_CreateButton("Disconnect", 70, 85, 99, 50, 0xFF7500)
+$ButtonDisconnect = _Metro_CreateButtonEx2("Disconnect", 70, 85, 99, 50, 0xFF7500)
 $ButtonChat = _Metro_CreateButton("Chat", 70, 115, 99, 25)
 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
 GUICtrlSetState($ButtonChat, $GUI_HIDE)
@@ -189,8 +189,6 @@ EndIf
     TrayCreateItem("") ; Create a separator line.
    Local $iWebsite = TrayCreateItem("Vers: " & $ReadVersion & " / Website", -1, -1, $TRAY_ITEM_NORMAL)
     Local $idExit = TrayCreateItem("Exit")
-GUISetState(@SW_SHOW)
-
 $AutoConnectSetting = IniRead($SettingsFile, "Settings", "AutoConnect", "")
 If $AutoConnectSetting >0 then
 		 TrayItemSetState ($iAutoConnect, $TRAY_CHECKED)
@@ -222,16 +220,20 @@ GUICtrlSetState($LabelNotConnected, $GUI_SHOW)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+				GUISetState(@SW_SHOW)
 		   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
     _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "No Connection to Network")
 				_GUIDisable($Form1)
 EndIf
    else
+	  				GUISetState(@SW_SHOW)
+
    EndIf
    EndIf
 EndIf
 EndIf
 EndIf
+
 Func _RandomText($length)
     $text = ""
     For $i = 1 To $length
