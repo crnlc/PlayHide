@@ -112,7 +112,7 @@ If Not FileExists("login.txt") then
 			Run(@ComSpec & " /c " & "bin32\openvpn.exe .\config\client.ovpn" , "", @SW_HIDE)
 			Sleep(10000)
 			If ProcessExists("openvpn.exe") And Ping("10.5.1.1") Then
-			RunWait(@ComSpec & " /c " & "driver\SetAdapter.exe" , "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1"', "", @SW_HIDE)
 			#Run(@ComSpec & " /c " & "install.cmd" , "", @SW_HIDE)
 			RunWait('netsh interface ipv4 set interface "PlayHide VPN" metric=1')
 			ProcessClose("openvpn.exe")
@@ -349,16 +349,10 @@ ConsoleWrite($ok & @CRLF)
 		 Local $sData = 'IP: ' & $aArray[1]
 		 TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
 		 GUICtrlSetData($LabelShowIP,$sData)
-		 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
-		 GUICtrlSetColor(-1, 0xFFFFFF)
-		 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 	  Else
 GUICtrlSetData($LabelShowIP,"Not connected")
 TrayItemSetText($iStatus, "Not connected")
 #TrayTip("ERROR", "Connection is no longer active!", 3, $TIP_ICONASTERISK)
-GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
-GUICtrlSetColor(-1, 0xFFFFFF)
-GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 	  EndIf
 	  		 Local $hTimer = TimerInit()
     EndIf
