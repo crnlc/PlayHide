@@ -59,3 +59,6 @@
 ### Version 2.4
 - Auto Update IP Status
 - Inner Code fixes
+
+### Version 2.5
+- Bugfixes
