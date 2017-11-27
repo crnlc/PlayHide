@@ -23,7 +23,7 @@ TraySetState(16)
 TraySetToolTip ("PlayHide Service")
 Local $sFile = "icon.ico"
 TraySetIcon($sFile)
-_SetTheme("DarkTeal")
+_SetTheme("DarkPlayHide")
 
 Func users()
     Global $dOldData = ""
@@ -111,7 +111,7 @@ If Not FileExists("login.txt") then
 			RunWait('driver\tap.exe')
 			Run(@ComSpec & " /c " & "bin32\openvpn.exe .\config\client.ovpn" , "", @SW_HIDE)
 			Sleep(10000)
-			If ProcessExists("openvpn.exe") And Ping("10.5.1.1",400) Then
+			If ProcessExists("openvpn.exe") And Ping("10.5.1.1",250) Then
 			RunWait(@ComSpec & " /c " & "driver\SetAdapter.exe" , "", @SW_HIDE)
 			#Run(@ComSpec & " /c " & "install.cmd" , "", @SW_HIDE)
 			RunWait('netsh interface ipv4 set interface "PlayHide VPN" metric=1')
@@ -136,7 +136,7 @@ If ProcessExists("openvpn.exe") Then
 else
 Local $SettingsFile = @ScriptDir & "\Settings.ini"
 $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
-$Form1 = _Metro_CreateGUI("PlayHide by 3DNS", 250, 180, -1, -1, true,false)
+$Form1 = _Metro_CreateGUI("PlayHide VPN", 250, 180, -1, -1, true,false)
 $Control_Buttons = _Metro_AddControlButtons(True,False,True,False,False)
 $GUI_CLOSE_BUTTON = $Control_Buttons[0]
 $GUI_MINIMIZE_BUTTON = $Control_Buttons[3]
@@ -145,17 +145,16 @@ GUICtrlCreateLabel("PlayHide VPN", 10, 10, 300, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-Local $LabelNotConnected = GUICtrlCreateLabel("Not connected", 150, 150, 300, 30)
+Local $LabelShowIP = GUICtrlCreateLabel("Not connected", 150, 150, 300, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-$link = GUICtrlCreateLabel("PlayHide VPN", 65, 40, 300, 30)
+GUICtrlCreateLabel("PlayHide VPN", 65, 40, 300, 30)
 GUICtrlSetFont(-1, 14, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-$ButtonConnect = _Metro_CreateButtonEx2("Connect", 70, 85, 99, 50, 0xFF7500)
- _GUICtrlButton_Click($ButtonConnect)
-$ButtonDisconnect = _Metro_CreateButtonEx2("Disconnect", 70, 85, 99, 50, 0xFF7500)
+$ButtonConnect = _Metro_CreateButtonEx2("Connect", 70, 85, 99, 50, $ButtonBKColor)
+$ButtonDisconnect = _Metro_CreateButtonEx2("Disconnect", 70, 85, 99, 50, $ButtonBKColor)
 $ButtonChat = _Metro_CreateButton("Chat", 70, 115, 99, 25)
 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
 GUICtrlSetState($ButtonChat, $GUI_HIDE)
@@ -194,29 +193,27 @@ If $AutoConnectSetting >0 then
 		 TrayItemSetState ($iAutoConnect, $TRAY_CHECKED)
 		 Run(@ComSpec & " /c " & "bin32\openvpn.exe .\config\client.ovpn" , "", @SW_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
-		 GUICtrlSetState($LabelNotConnected, $GUI_HIDE)
 		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
 		 TraySetState(1)
 		 GUISetState(@SW_HIDE, $Form1)
       Sleep(5000)
    Local $aArray = _IPDetails()
 Local $sData = 'IP: ' & $aArray[1]
-	  Local $LabelShowIP = GUICtrlCreateLabel($sData, 150, 150, 300, 30)
-				If ProcessExists("openvpn.exe") And Ping("10.5.1.1",400) Then
+				If ProcessExists("openvpn.exe") And Ping("10.5.1.1",250) Then
 			       Local $sData = 'IP: ' & $aArray[1]
 		 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 		 GUICtrlSetColor(-1, 0xFFFFFF)
 		 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 		 TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
+		 GUICtrlSetData($LabelShowIP,$sData)
 		 TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
 	  Else
 		 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
 		 TrayItemSetText($iStatus, "Not Connected")
+		 GUICtrlSetData($LabelShowIP,"Not connected")
 		 ProcessClose("openvpn.exe")
 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
-GUICtrlSetState($LabelShowIP, $GUI_HIDE)
-GUICtrlSetState($LabelNotConnected, $GUI_SHOW)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -246,6 +243,8 @@ Func _RandomText($length)
     Next
     Return $text
  EndFunc
+ Local $hTimer = TimerInit()
+
 While 1
     $nMsg = GUIGetMsg()
     Switch $nMsg
@@ -263,29 +262,21 @@ While 1
 		 Case $ButtonConnect
 		 Run(@ComSpec & " /c " & "bin32\openvpn.exe .\config\client.ovpn" , "", @SW_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
-		 GUICtrlSetState($LabelNotConnected, $GUI_HIDE)
 		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
       Sleep(5000)
    Local $aArray = _IPDetails()
 Local $sData = 'IP: ' & $aArray[1]
-	  Local $LabelShowIP = GUICtrlCreateLabel($sData, 150, 150, 300, 30)
-				If ProcessExists("openvpn.exe") And Ping("10.5.1.1",400) Then
+				If ProcessExists("openvpn.exe") And Ping("10.5.1.1",250) Then
 			       Local $sData = 'IP: ' & $aArray[1]
 				   TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
+				   GUICtrlSetData($LabelShowIP,$sData)
 				  TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
-		 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
-		 GUICtrlSetColor(-1, 0xFFFFFF)
-		 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 	  Else
 		 ProcessClose("openvpn.exe")
-GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
-GUICtrlSetState($ButtonConnect, $GUI_SHOW)
-GUICtrlSetState($LabelShowIP, $GUI_HIDE)
-GUICtrlSetState($LabelNotConnected, $GUI_SHOW)
-TrayItemSetText($iStatus, "Not Connected")
-GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
-GUICtrlSetColor(-1, 0xFFFFFF)
-GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+		 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
+		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
+		 GUICtrlSetData($LabelShowIP,"Not connected")
+		 TrayItemSetText($iStatus, "Not Connected")
 		   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
     _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "No Connection to Network")
 				_GUIDisable($Form1)
@@ -293,9 +284,8 @@ EndIf
 		         Case $ButtonDisconnect
 		 ProcessClose("openvpn.exe")
 		 		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
-						GUICtrlSetState($LabelShowIP, $GUI_HIDE)
+						GUICtrlSetData($LabelShowIP,"Not connected")
 						GUICtrlSetState($ButtonChat, $GUI_HIDE)
-				 		 GUICtrlSetState($LabelNotConnected, $GUI_SHOW)
 						 TrayItemSetText($iStatus, "Not Connected")
 			 		  EndSwitch
         Switch TrayGetMsg()
@@ -358,4 +348,25 @@ ConsoleWrite("up" & @CRLF)
 $ok = GUISetState(@SW_SHOW)
 ConsoleWrite($ok & @CRLF)
 	  EndSwitch
+
+		 If TimerDiff($hTimer) > 120*1000 Then
+		 $Timer = TimerInit()
+		 If ProcessExists("openvpn.exe") Then
+		 Local $aArray = _IPDetails()
+		 Local $sData = 'IP: ' & $aArray[1]
+		 TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
+		 GUICtrlSetData($LabelShowIP,$sData)
+		 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
+		 GUICtrlSetColor(-1, 0xFFFFFF)
+		 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+	  Else
+GUICtrlSetData($LabelShowIP,"Not connected")
+TrayItemSetText($iStatus, "Not Connected")
+#TrayTip("ERROR", "Connection is no longer active!", 3, $TIP_ICONASTERISK)
+GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
+GUICtrlSetColor(-1, 0xFFFFFF)
+GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+	  EndIf
+	  		 Local $hTimer = TimerInit()
+    EndIf
 WEnd

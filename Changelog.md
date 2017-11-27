@@ -55,3 +55,7 @@
 ### Version 2.3
 - Smooth Button
 - Fixed UI Trigger when AutoConnect is active
+
+### Version 2.4
+- Auto Update IP Status
+- Inner Code fixes
