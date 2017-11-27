@@ -59,3 +59,4 @@
 ### Version 2.4
 - Auto Update IP Status
 - Inner Code fixes
+- UI improvements
