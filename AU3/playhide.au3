@@ -134,6 +134,7 @@ If ProcessExists("openvpn.exe") Then
        _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "Only one Connection possible!")
    Exit
 else
+Local $hTimer = TimerInit()
 Local $SettingsFile = @ScriptDir & "\Settings.ini"
 $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 $Form1 = _Metro_CreateGUI("PlayHide VPN", 250, 180, -1, -1, true,false)
@@ -200,7 +201,10 @@ If $AutoConnectSetting >0 then
 				If ProcessExists("openvpn.exe") Then
 		 GUICtrlSetData($LabelShowIP,"Determine IP")
 		 TrayItemSetText($iStatus, 'Determine IP')
-		 #TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
+		 sleep(15000)
+		 $aArray = _IPDetails()
+		 $sData = 'IP: ' & $aArray[1]
+		 TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
 	  Else
 		 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
 		 TrayItemSetText($iStatus, "Not connected")
@@ -234,7 +238,6 @@ Func _RandomText($length)
     Next
     Return $text
  EndFunc
- Local $hTimer = TimerInit()
 
 While 1
     $nMsg = GUIGetMsg()
@@ -257,9 +260,8 @@ While 1
 		 sleep(500)
 				If ProcessExists("openvpn.exe") Then
 		 TrayItemSetText($iStatus, 'Determine IP')
-		 #GUICtrlSetData($LabelShowIP,$sData)
 		 GUICtrlSetData($LabelShowIP,"Determine IP")
-		 #TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
+		 sleep(5000)
 	  Else
 		 ProcessClose("openvpn.exe")
 		 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
@@ -272,6 +274,7 @@ While 1
 EndIf
 		         Case $ButtonDisconnect
 		 ProcessClose("openvpn.exe")
+		 		 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
 		 		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
 						GUICtrlSetData($LabelShowIP,"Not connected")
 						GUICtrlSetState($ButtonChat, $GUI_HIDE)
@@ -292,7 +295,7 @@ EndIf
 			run("bin32\chat.exe")
 			else
    		   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
-    _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "Chat is already running!")
+			_Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "Chat is already running!")
 				_GUIDisable($Form1)
 			 EndIf
 
@@ -334,9 +337,9 @@ EndIf
 				 			      		   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
     _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Auto Connect is on! (Change after Restart)")
 				_GUIDisable($Form1)
-EndIf
-   Case $iOpen
+			 EndIf
 
+   Case $iOpen
 ConsoleWrite("up" & @CRLF)
 $ok = GUISetState(@SW_SHOW)
 ConsoleWrite($ok & @CRLF)
@@ -345,10 +348,11 @@ ConsoleWrite($ok & @CRLF)
 		 If TimerDiff($hTimer) > 15*1000 Then
 		 $Timer = TimerInit()
 		 If ProcessExists("openvpn.exe") Then
-		 Local $aArray = _IPDetails()
-		 Local $sData = 'IP: ' & $aArray[1]
+		 $aArray = _IPDetails()
+		 $sData = 'IP: ' & $aArray[1]
 		 TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
 		 GUICtrlSetData($LabelShowIP,$sData)
+		 #TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
 	  Else
 GUICtrlSetData($LabelShowIP,"Not connected")
 TrayItemSetText($iStatus, "Not connected")
