@@ -15,7 +15,6 @@ DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
 #include <WinAPIFiles.au3>
 #include <InetConstants.au3>
 #include <GuiButton.au3>
-#RequireAdmin
 #traymenu()
 _Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
@@ -89,16 +88,16 @@ Else
     EndIf
 EndIf
 FileDelete(@ScriptDir & "\version.ini")
-If Not IsAdmin() Then
-			_Metro_MsgBox(0, "Error", "Admin required!")
-						Exit
-			   else
 If FileExists("PlayHide.7z") then
 			Run(@ComSpec & " /c " & "update.exe" , "", @SW_HIDE)
 
    exit
 else
 If Not FileExists("login.txt") then
+   If Not IsAdmin() Then
+			_Metro_MsgBox(0, "Error", "Admin required!")
+						Exit
+			   else
    			Local $file = FileOpen("login.txt", 2)
 			FileFlush($file)
 			FileWrite($file, _RandomText(10) & @CRLF)
@@ -128,6 +127,8 @@ If Not FileExists("login.txt") then
 						 FileDelete ('login.txt')
    Exit
 EndIf
+EndIf
+
 			Sleep(1000)
 else
 If ProcessExists("openvpn.exe") Then
@@ -222,7 +223,6 @@ EndIf
 
    EndIf
    EndIf
-EndIf
 EndIf
 EndIf
 
