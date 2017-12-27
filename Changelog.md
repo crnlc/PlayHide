@@ -63,3 +63,9 @@
 
 ### Version 2.5
 - Bugfixes
+
+### Version 2.6
+- Bugfixes
+
+### Version 2.7
+- Working Chat added
