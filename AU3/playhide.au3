@@ -18,8 +18,9 @@ DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
 #traymenu()
 _Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
+$AppName = "PlayHide VPN"
 TraySetState(16)
-TraySetToolTip ("PlayHide Service")
+TraySetToolTip ($AppName)
 Local $sFile = "icon.ico"
 TraySetIcon($sFile)
 _SetTheme("DarkPlayHide")
@@ -95,7 +96,7 @@ If FileExists("PlayHide.7z") then
 else
 If Not FileExists("login.txt") then
    If Not IsAdmin() Then
-			_Metro_MsgBox(0, "Error", "Admin required!")
+			_Metro_MsgBox(0, "Error", "Start Setup as Admin!")
 						Exit
 			   else
    			Local $file = FileOpen("login.txt", 2)
@@ -108,6 +109,7 @@ If Not FileExists("login.txt") then
 			$Setup = _Metro_MsgBox(0, "First run", "Setup required! Takes 30 Sec after TAP Installer")
 			#RunWait(@ComSpec & " /c " & '"' & @ScriptDir & '\driver\tapinstall.exe" install ' & '"' & @ScriptDir & '\driver\OemVista.inf" tap0901')
 			RunWait('driver\tap.exe')
+						_Metro_MsgBox(0, "Info", "Now we testing the Network and configure some more!")
 			Run(@ComSpec & " /c " & "bin32\openvpn.exe .\config\client.ovpn" , "", @SW_HIDE)
 			Sleep(10000)
 			If ProcessExists("openvpn.exe") And Ping("10.5.1.1") Then
@@ -115,14 +117,14 @@ If Not FileExists("login.txt") then
 			#Run(@ComSpec & " /c " & "install.cmd" , "", @SW_HIDE)
 			RunWait('netsh interface ipv4 set interface "PlayHide VPN" metric=1')
 			ProcessClose("openvpn.exe")
-			_Metro_MsgBox($MB_SYSTEMMODAL, "Finish", "Setup is finish! Now start PlayHide again!")
-			if Not FileExists(@DesktopDir & "\PlayHide VPN.lnk") Then
-			FileCreateShortcut(@AutoItExe, @DesktopDir & "\PlayHide VPN.lnk", @ScriptDir)
+			_Metro_MsgBox($MB_SYSTEMMODAL, "Finish", "Setup is done! Now start PlayHide again!")
+			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
+			FileCreateShortcut(@AutoItExe, @DesktopDir & "\" & $AppName & ".lnk", @ScriptDir)
 		 else
 			EndIf
 			Exit
 		 else
-			    _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "No Connection to Network")
+			    _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "Network testing was failed, try again!")
 						 ProcessClose("openvpn.exe")
 						 FileDelete ('login.txt')
    Exit
@@ -138,12 +140,12 @@ else
 Local $hTimer = TimerInit()
 Local $SettingsFile = @ScriptDir & "\Settings.ini"
 $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
-$Form1 = _Metro_CreateGUI("PlayHide VPN", 250, 180, -1, -1, true,false)
+$Form1 = _Metro_CreateGUI($AppName, 250, 180, -1, -1, true,false)
 $Control_Buttons = _Metro_AddControlButtons(True,False,True,False,False)
 $GUI_CLOSE_BUTTON = $Control_Buttons[0]
 $GUI_MINIMIZE_BUTTON = $Control_Buttons[3]
 GUISetIcon($sFile)
-GUICtrlCreateLabel("PlayHide VPN", 10, 10, 300, 30)
+GUICtrlCreateLabel($AppName, 10, 10, 300, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -151,7 +153,7 @@ Local $LabelShowIP = GUICtrlCreateLabel("Not connected", 150, 150, 300, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-GUICtrlCreateLabel("PlayHide VPN", 65, 40, 300, 30)
+GUICtrlCreateLabel($AppName, 65, 40, 300, 30)
 GUICtrlSetFont(-1, 14, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -182,7 +184,7 @@ EndIf
 			 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
    Local $iAutostart = TrayCreateItem("Autostart (Systemboot)")
    Local $iDesktopIcon = TrayCreateItem("Desktop Shortcut")
-   if FileExists(@DesktopDir & "\PlayHide VPN.lnk") Then
+   if FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
 			TrayItemSetState ($iDesktopIcon, $TRAY_DISABLE)
 			Else
 			TrayItemSetState ($iDesktopIcon, $TRAY_ENABLE)
@@ -198,7 +200,7 @@ If $AutoConnectSetting >0 then
 		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
 		 TraySetState(1)
 		 GUISetState(@SW_HIDE, $Form1)
-		 		 sleep(500)
+		 		 sleep(1000)
 				If ProcessExists("openvpn.exe") Then
 		 GUICtrlSetData($LabelShowIP,"Determine IP")
 		 TrayItemSetText($iStatus, 'Determine IP')
@@ -214,9 +216,6 @@ If $AutoConnectSetting >0 then
 		 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
 				GUISetState(@SW_SHOW)
-		   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
-    _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "No Connection to Network")
-				_GUIDisable($Form1)
 EndIf
    else
 	  				GUISetState(@SW_SHOW)
@@ -303,7 +302,7 @@ EndIf
 			             ShellExecute("http://playhide.tk")
 
 		 Case $iDesktopIcon
-			if Not FileExists(@DesktopDir & "\PlayHide VPN.lnk") Then
+			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
 			FileCreateShortcut(@AutoItExe, @DesktopDir & "\PlayHide VPN.lnk", @ScriptDir) ;für den aktuellen Benutzer
 			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
 			_Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Shortcut created!")
@@ -315,7 +314,7 @@ EndIf
 		 EndIf
 
 					 Case $iAutostart
-			if Not FileExists(@StartupDir & "\PlayHide.lnk") Then
+			if Not FileExists(@StartupDir & "\" & $AppName & ".lnk") Then
 			FileCreateShortcut(@AutoItExe, @StartupDir & "\PlayHide.lnk", @ScriptDir) ;für den aktuellen Benutzer
 			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
 			_Metro_MsgBox($MB_SYSTEMMODAL, "Info", "PlayHide is now StartUp with your System!")
