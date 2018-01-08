@@ -69,3 +69,8 @@
 
 ### Version 2.7
 - Working Chat added
+
+### Version 2.8
+- UI Stuff
+- Added DNS Hostname Support
+- Bugfixes
