@@ -1,4 +1,4 @@
-# PlayHide (Beta)
+# PlayHide VPN
 
 Build with Autoit & host in EU
 
@@ -13,6 +13,7 @@ Build with Autoit & host in EU
 _*Only Client to Client / no Traffic Gateway_
 
 ### Pro:
+- Chat
 - No Ads
 - No Logs
 - No Spyware
@@ -21,11 +22,11 @@ _*Only Client to Client / no Traffic Gateway_
 - Simple Setup/UI
 - No Port forwarding needed
 - No Account or Registration required 
+- DNS Hostname Support with Domain Suffix (.vpn)
 - Full Open Source with OpenVPN
 
 ### Kontra:
-- No Chats include like Tunngle
-- No fixed IP (possible on Request)
+- Currently one Subnet
 
 _Tested with Call of Duty WWII & other Games under Windows 7 / 10 / 8.1_
 
