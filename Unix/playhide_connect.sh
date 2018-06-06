@@ -1,0 +1,1 @@
+screen -d -S PlayHide-VPN -m openvpn /etc/openvpn/playhide.conf
