@@ -74,3 +74,12 @@
 - UI Stuff
 - Added DNS Hostname Support
 - Bugfixes
+
+### Version 2.9
+- Bugfixes
+
+### Version 3.0
+- last OpenVPN Binaries Updated
+
+### Version 3.1
+- Fixed demtermine IP
