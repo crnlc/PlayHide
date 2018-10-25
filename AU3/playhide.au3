@@ -43,7 +43,7 @@ EndFunc
 
 Func _IPDetails()
     Local $oWMIService = ObjGet('winmgmts:{impersonationLevel = impersonate}!\\' & '.' & '\root\cimv2')
-    Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where IPConnectionMetric=1', 'WQL', 0x30), $aReturn[5] = [0]
+    Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where DNSDomain="vpn"', 'WQL', 0x30), $aReturn[5] = [0]
     If IsObj($oColItems) Then
         For $oObjectItem In $oColItems
             If $oObjectItem.IPAddress(0) == @IPAddress1 Then
@@ -200,7 +200,6 @@ If $AutoConnectSetting >0 then
 		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
 		 TraySetState(1)
 		 GUISetState(@SW_HIDE, $Form1)
-		 		 sleep(1000)
 				If ProcessExists("openvpn.exe") Then
 		 GUICtrlSetData($LabelShowIP,"Determine IP")
 		 TrayItemSetText($iStatus, 'Determine IP')
@@ -344,7 +343,7 @@ $ok = GUISetState(@SW_SHOW)
 ConsoleWrite($ok & @CRLF)
 	  EndSwitch
 
-		 If TimerDiff($hTimer) > 15*1000 Then
+		 If TimerDiff($hTimer) > 5*1000 Then
 		 $Timer = TimerInit()
 		 If ProcessExists("openvpn.exe") Then
 		 $aArray = _IPDetails()
