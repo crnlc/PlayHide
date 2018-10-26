@@ -82,4 +82,4 @@
 - last OpenVPN Binaries Updated
 
 ### Version 3.1
-- Fixed demtermine IP
+- Fixed dentermine IP
