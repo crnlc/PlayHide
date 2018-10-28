@@ -19,8 +19,13 @@ DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
 _Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
 $AppName = "PlayHide VPN"
-$ServerIP = "vpn.playhide.tk"
-$ServerPort = "1400"
+#$ServerIP = "vpn.playhide.tk"
+#$ServerPort = "1400"
+Global $SettingsFile = @ScriptDir & "\Settings.ini"
+Global $ServerList = @ScriptDir & "\config\servers.ini"
+Global $ServerSaved = IniRead($SettingsFile, "Settings", "Server", "")
+Global $ServerIP = IniRead($ServerList, $ServerSaved, "IP", "")
+Global $ServerPort = IniRead($ServerList, $ServerSaved, "Port", "")
 TraySetState(16)
 TraySetToolTip ($AppName)
 Local $sFile = "icon.ico"
@@ -144,14 +149,14 @@ If ProcessExists("openvpn.exe") Then
    Exit
 else
 Local $hTimer = TimerInit()
-Local $SettingsFile = @ScriptDir & "\Settings.ini"
 $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 $Form1 = _Metro_CreateGUI($AppName, 250, 180, -1, -1, true,false)
-$Control_Buttons = _Metro_AddControlButtons(True,False,True,False,False)
+$Control_Buttons = _Metro_AddControlButtons(True,False,True,False,True)
 $GUI_CLOSE_BUTTON = $Control_Buttons[0]
 $GUI_MINIMIZE_BUTTON = $Control_Buttons[3]
+$GUI_MENU_BUTTON = $Control_Buttons[6]
 GUISetIcon($sFile)
-GUICtrlCreateLabel($AppName, 10, 10, 300, 30)
+GUICtrlCreateLabel($AppName, 50, 7, 300, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -165,9 +170,7 @@ GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 $ButtonConnect = _Metro_CreateButtonEx2("Connect", 70, 85, 99, 50, $ButtonBKColor)
 $ButtonDisconnect = _Metro_CreateButtonEx2("Disconnect", 70, 85, 99, 50, $ButtonBKColor)
-$ButtonChat = _Metro_CreateButton("Chat", 70, 115, 99, 25)
 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
-GUICtrlSetState($ButtonChat, $GUI_HIDE)
 $UpdaterVersionFile = @ScriptDir & "\updater.ini"
 $ReadVersion = IniRead($UpdaterVersionFile, "Version", "Version", "")
 $link = GUICtrlCreateLabel("Vers: " & $ReadVersion & " / Website", 10, 150, 300, 30)
@@ -244,6 +247,31 @@ Func _RandomText($length)
     Return $text
  EndFunc
 
+Func ServerList()
+			$GUIServer = _Metro_CreateGUI($AppName, 160, 80, -1, -1, false,false)
+			$ContentList = IniReadSectionNames($ServerList)
+			$Chooser = GUICtrlCreateCombo("", 30, 15, 99, 25, BitOR($CBS_DROPDOWNLIST,$CBS_AUTOHSCROLL))
+			GUICtrlSetData($Chooser, _ArraytoString($ContentList, "|", 1), $ContentList[1])
+			$ButtonServerOK = _Metro_CreateButtonEx2("Apply", 50, 40, 50, 30, $ButtonBKColor)
+			GUICtrlSetState($Chooser, $GUI_SHOW)
+			GUISetState(@SW_SHOW, $GUIServer)
+
+While 1
+    $nMsg = GUIGetMsg()
+    Switch $nMsg
+	Case $ButtonServerOK
+	  $ChooserPick = GUICtrlRead($Chooser)
+	  IniWrite($SettingsFile, "Settings", "Server", $ChooserPick)
+	      _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Server switched, start PlayHide again!")
+				_GUIDisable($GUIServer)
+		 #GUICtrlSetState($Chooser, $GUI_HIDE)
+		 _Metro_GUIDelete($GUIServer)
+		 #ExitLoop
+		 Exit
+	  EndSwitch
+	  WEnd
+	 EndFunc
+
 While 1
     $nMsg = GUIGetMsg()
     Switch $nMsg
@@ -282,9 +310,20 @@ EndIf
 		 		 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
 		 		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
 						GUICtrlSetData($LabelShowIP,"Not connected")
-						GUICtrlSetState($ButtonChat, $GUI_HIDE)
 						 TrayItemSetText($iStatus, "Not Connected")
-
+		Case $GUI_MENU_BUTTON
+			;Create an Array containing menu button names
+			Local $MenuButtonsArray[5] = ["Servers", "Close"]
+			; Open the metro Menu. See decleration of $MenuButtonsArray above.
+			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
+			Switch $MenuSelect ;Above function returns the index number of the selected button from the provided buttons array.
+			   Case "0"
+					 ServerList()
+				Case "1"
+					 ProcessClose("openvpn.exe")
+					_Metro_GUIDelete($Form1)
+					Exit
+			EndSwitch
 
 			 		  EndSwitch
 
@@ -305,7 +344,7 @@ EndIf
 			 EndIf
 
 		  Case $iWebsite
-			             ShellExecute("http://playhide.tk")
+			   ShellExecute("http://playhide.tk")
 
 		 Case $iDesktopIcon
 			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
@@ -340,7 +379,7 @@ EndIf
 			 else
 				 IniWrite($SettingsFile, "Settings", "AutoConnect", "1")
 				 			      		   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
-    _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Auto Connect is on! (Change after Restart)")
+			   _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Auto Connect is on! (Change after Restart)")
 				_GUIDisable($Form1)
 			 EndIf
 
