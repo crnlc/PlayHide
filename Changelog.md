@@ -83,3 +83,9 @@
 
 ### Version 3.1
 - Fixed dentermine IP
+
+### Version 3.2
+- Make Server connecting internal
+
+### Version 3.3
+- Server switching over GUI / Ini (currently one but more coming soon)
