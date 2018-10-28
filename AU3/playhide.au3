@@ -19,6 +19,8 @@ DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
 _Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
 $AppName = "PlayHide VPN"
+$ServerIP = "vpn.playhide.tk"
+$ServerPort = "1400"
 TraySetState(16)
 TraySetToolTip ($AppName)
 Local $sFile = "icon.ico"
@@ -106,20 +108,19 @@ If Not FileExists("login.txt") then
 			FileClose($file)
 			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="PlayHide VPN" dir=in action=allow protocol=UDP localport=1400' , "", @SW_HIDE)
 			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
-			#$Setup = _Metro_MsgBox(0, "First run", "Setup required! Takes 30 Sec after TAP Installer")
-			$Setup = _Metro_MsgBox(0, "First run", "Setup starting now!")
-			RunWait(@ComSpec & " /c " & '"' & @ScriptDir & '\driver\tapinstall.exe" remove tap0901')
-			RunWait(@ComSpec & " /c " & '"' & @ScriptDir & '\driver\tapinstall.exe" restart tap0901')
-			RunWait(@ComSpec & " /c " & '"' & @ScriptDir & '\driver\tapinstall.exe" install driver\OemVista.inf tap0901')
-			RunWait(@ComSpec & " /c " & '"' & @ScriptDir & '\driver\tapinstall.exe" restart tap0901')
-			#RunWait('driver\tap.exe')
+			$Setup = _Metro_MsgBox(0, "First run", "Setup required! Takes 30 Sec after TAP Installer")
+			#$Setup = _Metro_MsgBox(0, "First run", "Setup starting now!")
+			#RunWait(@ScriptDir & '\driver\tapinstall.exe" remove tap0901')
+			#RunWait(@ScriptDir & '\driver\tapinstall.exe" restart tap0901')
+			#RunWait(@ScriptDir & '\driver\tapinstall.exe" install driver\OemVista.inf tap0901')
+			#RunWait(@ScriptDir & '\driver\tapinstall.exe" restart tap0901')
+			RunWait('driver\tap.exe')
 						_Metro_MsgBox(0, "Info", "Now we testing the Network and configure some more!")
-			Run(@ComSpec & " /c " & "bin32\openvpn.exe .\config\client.ovpn" , "", @SW_HIDE)
+			Run(@ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --config .\config\client.ovpn", "", @SW_HIDE)
 			Sleep(10000)
 			If ProcessExists("openvpn.exe") And Ping("10.5.1.1") Then
 			Sleep(100)
 			RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1"', "", @SW_HIDE)
-			#Run(@ComSpec & " /c " & "install.cmd" , "", @SW_HIDE)
 			RunWait('netsh interface ipv4 set interface "PlayHide VPN" metric=1')
 			ProcessClose("openvpn.exe")
 			_Metro_MsgBox($MB_SYSTEMMODAL, "Finish", "Setup is done! Now start PlayHide again!")
@@ -200,7 +201,7 @@ EndIf
 $AutoConnectSetting = IniRead($SettingsFile, "Settings", "AutoConnect", "")
 If $AutoConnectSetting >0 then
 		 TrayItemSetState ($iAutoConnect, $TRAY_CHECKED)
-		 Run(@ComSpec & " /c " & "bin32\openvpn.exe .\config\client.ovpn" , "", @SW_HIDE)
+		 Run(@ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --config .\config\client.ovpn", "", @SW_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
 		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
 		 TraySetState(1)
@@ -258,7 +259,7 @@ While 1
             ShellExecute("http://playhide.tk")
 
 		 Case $ButtonConnect
-		 Run(@ComSpec & " /c " & "bin32\openvpn.exe .\config\client.ovpn" , "", @SW_HIDE)
+		 Run(@ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --config .\config\client.ovpn", "", @SW_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
 		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
 		 sleep(500)
