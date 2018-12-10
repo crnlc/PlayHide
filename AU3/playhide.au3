@@ -32,20 +32,14 @@ Local $sFile = "icon.ico"
 TraySetIcon($sFile)
 _SetTheme("DarkPlayHide")
 
-Func users()
+Func _users()
     Global $dOldData = ""
     Local $dData = InetRead("http://vpn.playhide.tk/users_online.php",1)
     Local $sData = BinaryToString($dData)
 	    If $dOlddata <> $dData Then
         $dOlddata = $dData
 	 EndIf
-	 	Local $users = GUICtrlCreateLabel('Online Users: ' & $sData, 150, 140, 300, 30)
-	 GUICtrlSetState($users, $GUI_SHOW)
-	 	 GUICtrlSetState($users, $GUI_HIDE)
-
-GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
-GUICtrlSetColor(-1, 0xFFFFFF)
-GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+    Return $sData
 EndFunc
 
 Func _IPDetails()
@@ -68,7 +62,6 @@ $newVersion = "0.0"
 $Ini = InetGet($VersionsInfo,@ScriptDir & "\version.ini") ;download version.ini
 
 If $Ini = 0 Then ;was the download of version.ini successful?
-    _Metro_MsgBox(0,"ERROR","The server seems to be offline.")
 Else
     $newVersion = IniRead (@ScriptDir & "\version.ini","Version","Version","") ;reads the new version out of version.ini
     If $NewVersion = $oldVersion Then ;compare old and new
@@ -91,7 +84,6 @@ Else
             ProgressOff() ;close progress window
             IniWrite("updater.ini","version","version",$NewVersion) ;updates update.ini with the new version
             InetClose($dlhandle)
-            _Metro_MsgBox(-1,"Success","Update will start!")
             EndIf
     EndIf
 EndIf
@@ -114,15 +106,10 @@ If Not FileExists("login.txt") then
 			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="PlayHide VPN" dir=in action=allow protocol=UDP localport=1400' , "", @SW_HIDE)
 			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
 			$Setup = _Metro_MsgBox(0, "First run", "Setup required! Takes 30 Sec after TAP Installer")
-			#$Setup = _Metro_MsgBox(0, "First run", "Setup starting now!")
-			#RunWait(@ScriptDir & '\driver\tapinstall.exe" remove tap0901')
-			#RunWait(@ScriptDir & '\driver\tapinstall.exe" restart tap0901')
-			#RunWait(@ScriptDir & '\driver\tapinstall.exe" install driver\OemVista.inf tap0901')
-			#RunWait(@ScriptDir & '\driver\tapinstall.exe" restart tap0901')
 			RunWait('driver\tap.exe')
+			Run(@ComSpec & " /c " & "bin32\openvpn.exe --remote " & "vpn.playhide.tk" & " " & "1400" & " --config .\config\client.ovpn", "", @SW_HIDE)
 						_Metro_MsgBox(0, "Info", "Now we testing the Network and configure some more!")
-			Run(@ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --config .\config\client.ovpn", "", @SW_HIDE)
-			Sleep(10000)
+			Sleep(15000)
 			If ProcessExists("openvpn.exe") And Ping("10.5.1.1") Then
 			Sleep(100)
 			RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1"', "", @SW_HIDE)
@@ -149,10 +136,11 @@ If ProcessExists("openvpn.exe") Then
    Exit
 else
 Local $hTimer = TimerInit()
+Local $hTimer2 = TimerInit()
 $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 $Form1 = _Metro_CreateGUI($AppName, 250, 180, -1, -1, true,false)
-$Control_Buttons = _Metro_AddControlButtons(True,False,True,False,True)
-$GUI_CLOSE_BUTTON = $Control_Buttons[0]
+$Control_Buttons = _Metro_AddControlButtons(False,False,True,False,True)
+#$GUI_CLOSE_BUTTON = $Control_Buttons[0]
 $GUI_MINIMIZE_BUTTON = $Control_Buttons[3]
 $GUI_MENU_BUTTON = $Control_Buttons[6]
 GUISetIcon($sFile)
@@ -213,7 +201,6 @@ If $AutoConnectSetting >0 then
 				If ProcessExists("openvpn.exe") Then
 		 GUICtrlSetData($LabelShowIP,"Determine IP")
 		 TrayItemSetText($iStatus, 'Determine IP')
-		 sleep(15000)
 		 $aArray = _IPDetails()
 		 $sData = 'IP: ' & $aArray[1]
 		 TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
@@ -251,6 +238,7 @@ Func ServerList()
 			$GUIServer = _Metro_CreateGUI($AppName, 160, 80, -1, -1, false,false)
 			$ContentList = IniReadSectionNames($ServerList)
 			$Chooser = GUICtrlCreateCombo("", 30, 15, 99, 25, BitOR($CBS_DROPDOWNLIST,$CBS_AUTOHSCROLL))
+			#$ServerLocation = IniRead($ServerList, , "IP", "")
 			GUICtrlSetData($Chooser, _ArraytoString($ContentList, "|", 1), $ContentList[1])
 			$ButtonServerOK = _Metro_CreateButtonEx2("Apply", 50, 40, 50, 30, $ButtonBKColor)
 			GUICtrlSetState($Chooser, $GUI_SHOW)
@@ -267,6 +255,7 @@ While 1
 		 #GUICtrlSetState($Chooser, $GUI_HIDE)
 		 _Metro_GUIDelete($GUIServer)
 		 #ExitLoop
+		 ProcessClose("openvpn.exe")
 		 Exit
 	  EndSwitch
 	  WEnd
@@ -275,10 +264,10 @@ While 1
 While 1
     $nMsg = GUIGetMsg()
     Switch $nMsg
-	  Case $GUI_EVENT_CLOSE, $GUI_CLOSE_BUTTON
-		 ProcessClose("openvpn.exe")
-		 _Metro_GUIDelete($Form1)
-		 Exit
+	  #Case $GUI_EVENT_CLOSE, $GUI_CLOSE_BUTTON
+		 #ProcessClose("openvpn.exe")
+		 #_Metro_GUIDelete($Form1)
+		 #Exit
 
 			   Case $GUI_MINIMIZE_BUTTON
 			   TraySetState(1)
@@ -294,15 +283,15 @@ While 1
 				If ProcessExists("openvpn.exe") Then
 		 TrayItemSetText($iStatus, 'Determine IP')
 		 GUICtrlSetData($LabelShowIP,"Determine IP")
-		 sleep(5000)
+		 sleep(8000)
 	  Else
 		 ProcessClose("openvpn.exe")
 		 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
 		 GUICtrlSetData($LabelShowIP,"Not connected")
 		 TrayItemSetText($iStatus, "Not connected")
-		   			_GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
-    _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "No Connection to Network")
+		 _GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+		 _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "No Connection to Network")
 				_GUIDisable($Form1)
 EndIf
 		         Case $ButtonDisconnect
@@ -311,12 +300,14 @@ EndIf
 		 		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
 						GUICtrlSetData($LabelShowIP,"Not connected")
 						 TrayItemSetText($iStatus, "Not Connected")
+
 		Case $GUI_MENU_BUTTON
-			;Create an Array containing menu button names
-			Local $MenuButtonsArray[5] = ["Servers", "Close"]
-			; Open the metro Menu. See decleration of $MenuButtonsArray above.
+		 #$uArray = _users()
+		 #$Users = 'User Online: ' & $uArray
+		 $Users = 'User Online: 0'
+		 Local $MenuButtonsArray[5] = ["Servers", "Close"]
 			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
-			Switch $MenuSelect ;Above function returns the index number of the selected button from the provided buttons array.
+			Switch $MenuSelect
 			   Case "0"
 					 ServerList()
 				Case "1"
@@ -326,7 +317,6 @@ EndIf
 			EndSwitch
 
 			 		  EndSwitch
-
 
         Switch TrayGetMsg()
             Case $idExit
@@ -396,7 +386,6 @@ ConsoleWrite($ok & @CRLF)
 		 $sData = 'IP: ' & $aArray[1]
 		 TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
 		 GUICtrlSetData($LabelShowIP,$sData)
-		 #TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
 	  Else
 GUICtrlSetData($LabelShowIP,"Not connected")
 TrayItemSetText($iStatus, "Not connected")
