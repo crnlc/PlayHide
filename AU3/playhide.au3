@@ -201,6 +201,7 @@ If $AutoConnectSetting >0 then
 				If ProcessExists("openvpn.exe") Then
 		 GUICtrlSetData($LabelShowIP,"Determine IP")
 		 TrayItemSetText($iStatus, 'Determine IP')
+		 sleep(12000)
 		 $aArray = _IPDetails()
 		 $sData = 'IP: ' & $aArray[1]
 		 TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
