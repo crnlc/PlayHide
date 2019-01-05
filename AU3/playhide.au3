@@ -15,6 +15,7 @@ DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
 #include <WinAPIFiles.au3>
 #include <InetConstants.au3>
 #include <GuiButton.au3>
+#include <Misc.au3>
 #traymenu()
 _Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
@@ -131,6 +132,10 @@ EndIf
 
 			Sleep(1000)
 else
+if _Singleton($Appname, 1) = 0 Then
+	       _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "The program is already running!")
+    Exit
+EndIf
 If ProcessExists("openvpn.exe") Then
        _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "Only one Connection possible!")
    Exit
@@ -206,10 +211,11 @@ If $AutoConnectSetting >0 then
 				If ProcessExists("openvpn.exe") Then
 		 GUICtrlSetData($LabelShowIP,"Determine IP")
 		 TrayItemSetText($iStatus, 'Determine IP')
-		 sleep(12000)
 		 $aArray = _IPDetails()
 		 $sData = 'IP: ' & $aArray[1]
+		 if $aArray[1] Then
 		 TrayTip("Connected", 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
+		 EndIf
 	  Else
 		 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
 		 TrayItemSetText($iStatus, "Not connected")
@@ -303,7 +309,6 @@ While 1
 				If ProcessExists("openvpn.exe") Then
 		 TrayItemSetText($iStatus, 'Determine IP')
 		 GUICtrlSetData($LabelShowIP,"Determine IP")
-		 sleep(8000)
 	  Else
 		 ProcessClose("openvpn.exe")
 		 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
@@ -403,8 +408,10 @@ ConsoleWrite($ok & @CRLF)
 		 If ProcessExists("openvpn.exe") Then
 		 $aArray = _IPDetails()
 		 $sData = 'IP: ' & $aArray[1]
+		 if $aArray[1] Then
 		 TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
 		 GUICtrlSetData($LabelShowIP,$sData)
+		 EndIf
 	  Else
 GUICtrlSetData($LabelShowIP,"Not connected")
 TrayItemSetText($iStatus, "Not connected")
