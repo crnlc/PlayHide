@@ -2,7 +2,7 @@
 
 Build with Autoit & host in EU
 
-![Screenshot](https://git.3dns.eu/PlayHide/raw/master/res/client.png)
+![Screenshot](https://github.com/DoM1niC/PlayHide/blob/master/res/client.png?raw=true)
 
 ## Features
 - Play Games with LAN mode
