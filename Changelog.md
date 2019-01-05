@@ -96,3 +96,7 @@
 ### Version 3.7
 - Label with current Server in UI
 - Self Restart Function after Server switch or Done Setup
+
+### Version 3.8
+- Fixed sleep UI to dentermine IP
+- Single Instance Check
