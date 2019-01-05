@@ -32,16 +32,6 @@ Local $sFile = "icon.ico"
 TraySetIcon($sFile)
 _SetTheme("DarkPlayHide")
 
-Func _users()
-    Global $dOldData = ""
-    Local $dData = InetRead("http://vpn.playhide.tk/users_online.php",1)
-    Local $sData = BinaryToString($dData)
-	    If $dOlddata <> $dData Then
-        $dOlddata = $dData
-	 EndIf
-    Return $sData
-EndFunc
-
 Func _IPDetails()
     Local $oWMIService = ObjGet('winmgmts:{impersonationLevel = impersonate}!\\' & '.' & '\root\cimv2')
     Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where DNSDomain="vpn"', 'WQL', 0x30), $aReturn[5] = [0]
@@ -54,6 +44,15 @@ Func _IPDetails()
         Next
     EndIf
     Return SetError($aReturn[0] = 0, 0, $aReturn)
+ EndFunc
+
+Func RestartScript()
+    If @Compiled = 1 Then
+        Run( FileGetShortName(@ScriptFullPath))
+    Else
+        Run( FileGetShortName(@AutoItExe) & " " & FileGetShortName(@ScriptFullPath))
+    EndIf
+    Exit
  EndFunc
 
 $VersionsInfo = "http://playhide.tk/files/version.ini"
@@ -115,11 +114,12 @@ If Not FileExists("login.txt") then
 			RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1"', "", @SW_HIDE)
 			RunWait('netsh interface ipv4 set interface "PlayHide VPN" metric=1')
 			ProcessClose("openvpn.exe")
-			_Metro_MsgBox($MB_SYSTEMMODAL, "Finish", "Setup is done! Now start PlayHide again!")
+			_Metro_MsgBox($MB_SYSTEMMODAL, "Finish", "Setup is done!")
 			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
 			FileCreateShortcut(@AutoItExe, @DesktopDir & "\" & $AppName & ".lnk", @ScriptDir)
 		 else
-			EndIf
+		 EndIf
+		 RestartScript()
 			Exit
 		 else
 			    _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "Network testing was failed, try again!")
@@ -138,7 +138,7 @@ else
 Local $hTimer = TimerInit()
 Local $hTimer2 = TimerInit()
 $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
-$Form1 = _Metro_CreateGUI($AppName, 250, 180, -1, -1, true,false)
+$Form1 = _Metro_CreateGUI($AppName, 250, 200, -1, -1, true,false)
 $Control_Buttons = _Metro_AddControlButtons(False,False,True,False,True)
 #$GUI_CLOSE_BUTTON = $Control_Buttons[0]
 $GUI_MINIMIZE_BUTTON = $Control_Buttons[3]
@@ -159,9 +159,14 @@ GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 $ButtonConnect = _Metro_CreateButtonEx2("Connect", 70, 85, 99, 50, $ButtonBKColor)
 $ButtonDisconnect = _Metro_CreateButtonEx2("Disconnect", 70, 85, 99, 50, $ButtonBKColor)
 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
+$ReadServer = IniRead($SettingsFile, "Settings", "Server", "")
+$ShowServerLabel = GUICtrlCreateLabel("Server: " & $ReadServer, 150, 170, 300, 30)
+GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
+GUICtrlSetColor(-1, 0xFFFFFF)
+GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 $UpdaterVersionFile = @ScriptDir & "\updater.ini"
 $ReadVersion = IniRead($UpdaterVersionFile, "Version", "Version", "")
-$link = GUICtrlCreateLabel("Vers: " & $ReadVersion & " / Website", 10, 150, 300, 30)
+$link = GUICtrlCreateLabel("Vers: " & $ReadVersion & " / Website", 10, 170, 300, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -187,9 +192,9 @@ EndIf
 			TrayItemSetState ($iDesktopIcon, $TRAY_ENABLE)
 			EndIf
     TrayCreateItem("") ; Create a separator line.
-   Local $iWebsite = TrayCreateItem("Vers: " & $ReadVersion & " / Website", -1, -1, $TRAY_ITEM_NORMAL)
+    Local $iWebsite = TrayCreateItem("Vers: " & $ReadVersion & " / Website", -1, -1, $TRAY_ITEM_NORMAL)
     Local $idExit = TrayCreateItem("Exit")
-$AutoConnectSetting = IniRead($SettingsFile, "Settings", "AutoConnect", "")
+   $AutoConnectSetting = IniRead($SettingsFile, "Settings", "AutoConnect", "")
 If $AutoConnectSetting >0 then
 		 TrayItemSetState ($iAutoConnect, $TRAY_CHECKED)
 		 Run(@ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --config .\config\client.ovpn", "", @SW_HIDE)
@@ -251,16 +256,30 @@ While 1
 	Case $ButtonServerOK
 	  $ChooserPick = GUICtrlRead($Chooser)
 	  IniWrite($SettingsFile, "Settings", "Server", $ChooserPick)
-	      _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Server switched, start PlayHide again!")
+	      _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Server switched, PlayHide restart now!")
 				_GUIDisable($GUIServer)
 		 #GUICtrlSetState($Chooser, $GUI_HIDE)
 		 _Metro_GUIDelete($GUIServer)
 		 #ExitLoop
 		 ProcessClose("openvpn.exe")
+		 RestartScript()
 		 Exit
 	  EndSwitch
 	  WEnd
-	 EndFunc
+   EndFunc
+
+Func Users()
+   TimerInit()
+    Global $dOldData = ""
+    Local $dData = InetRead("http://vpn.playhide.tk/users_online.php")
+	sleep(500)
+	InetClose($dData)
+    Local $sData = BinaryToString($dData)
+	    If $dOlddata <> $dData Then
+        $dOlddata = $dData
+	 EndIf
+    Return $sData
+ EndFunc
 
 While 1
     $nMsg = GUIGetMsg()
@@ -291,21 +310,20 @@ While 1
 		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
 		 GUICtrlSetData($LabelShowIP,"Not connected")
 		 TrayItemSetText($iStatus, "Not connected")
-		 _GUIDisable($Form1, 0, 30) ;For better visibility of the MsgBox on top of the first GUI.
+		 _GUIDisable($Form1, 0, 30)
 		 _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "No Connection to Network")
 				_GUIDisable($Form1)
 EndIf
 		         Case $ButtonDisconnect
-		 ProcessClose("openvpn.exe")
-		 		 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
-		 		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
-						GUICtrlSetData($LabelShowIP,"Not connected")
-						 TrayItemSetText($iStatus, "Not Connected")
+				  ProcessClose("openvpn.exe")
+		 		  GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
+		 		  GUICtrlSetState($ButtonConnect, $GUI_SHOW)
+				  GUICtrlSetData($LabelShowIP,"Not connected")
+				  TrayItemSetText($iStatus, "Not Connected")
 
 		Case $GUI_MENU_BUTTON
-		 #$uArray = _users()
-		 #$Users = 'User Online: ' & $uArray
-		 $Users = 'User Online: 0'
+		 #$Users = 'User Online: ' & Users()
+		 #$Users = 'User Online: 0'
 		 Local $MenuButtonsArray[5] = ["Servers", "Close"]
 			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
 			Switch $MenuSelect
