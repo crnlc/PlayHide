@@ -89,3 +89,10 @@
 
 ### Version 3.3
 - Server switching over GUI / Ini (currently one but more coming soon)
+
+### Version 3.4-6
+- Bugfixes
+
+### Version 3.7
+- Label with current Server in UI
+- Self Restart Function after Server switch or Done Setup
