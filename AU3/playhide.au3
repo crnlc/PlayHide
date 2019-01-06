@@ -20,14 +20,19 @@ DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
 _Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
 $AppName = "PlayHide VPN"
-#$ServerIP = "vpn.playhide.tk"
-#$ServerPort = "1400"
+Global $LoginFile = @ScriptDir & "\login.txt"
 Global $SettingsFile = @ScriptDir & "\Settings.ini"
 Global $ServerList = @ScriptDir & "\config\servers.ini"
 Global $ServerSaved = IniRead($SettingsFile, "Settings", "Server", "")
 Global $ServerIP = IniRead($ServerList, $ServerSaved, "IP", "")
 Global $ServerPort = IniRead($ServerList, $ServerSaved, "Port", "")
+Global $ServerProto = IniRead($ServerList, $ServerSaved, "Protocol", "")
+Global $ServerDev = IniRead($ServerList, $ServerSaved, "Interface", "")
 Global $ServerSubnet = IniRead($ServerList, $ServerSaved, "Subnet", "")
+Global $ServerCA = IniRead($ServerList, $ServerSaved, "Cert", "")
+Global $Connect = @ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --ca .\certs\" & $ServerCA & " --dev " & $ServerDev & " --proto " & $ServerProto & " --config .\config\client.ovpn"
+Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
+Global $AuthSetting = IniRead($SettingsFile, "Settings", "Auth", "")
 TraySetState(16)
 TraySetToolTip ($AppName)
 Local $sFile = "icon.ico"
@@ -144,17 +149,27 @@ If Not FileExists("login.txt") then
    If Not IsAdmin() Then
 			_Metro_MsgBox(0, "Error", "Start Setup as Admin!")
 						Exit
-			   else
-   			Local $file = FileOpen("login.txt", 2)
+					 else
+			If $AuthSetting >0 then
+			$Username = _Metro_InputBox2("Username", 15, "", False, False)
+			$Passwort = _Metro_InputBox2("Password", 15, "", true, False)
+			$file = FileOpen($LoginFile, 2)
+			FileFlush($file)
+			FileWrite($file, $Username & @CRLF)
+			FileWrite($file, $Passwort)
+			FileClose($file)
+else
+   			Local $file = FileOpen($LoginFile, 2)
 			FileFlush($file)
 			FileWrite($file, _RandomText(10) & @CRLF)
 			FileWrite($file, _RandomText(10))
 			FileClose($file)
-			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="PlayHide VPN" dir=in action=allow protocol=UDP localport=1400' , "", @SW_HIDE)
+			Endif
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="PlayHide VPN" dir=in action=allow protocol=' & $ServerProto & ' localport=' & $ServerPort , "", @SW_HIDE)
 			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
 			$Setup = _Metro_MsgBox(0, "First run", "Setup required! Takes 30 Sec after TAP Installer")
 			RunWait('driver\tap.exe')
-			Run(@ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --config .\config\client.ovpn", "", @SW_HIDE)
+			Run($Connect, "", @SW_HIDE)
 						_Metro_MsgBox(0, "Info", "Now we testing the Network and configure some more!")
 			Sleep(15000)
 			If ProcessExists("openvpn.exe") And Ping($ServerSubnet & "1") Then
@@ -172,7 +187,7 @@ If Not FileExists("login.txt") then
 		 else
 			    _Metro_MsgBox($MB_SYSTEMMODAL, "ERROR", "Network testing was failed, try again!")
 						 ProcessClose("openvpn.exe")
-						 FileDelete ('login.txt')
+						 FileDelete ($LoginFile)
    Exit
 EndIf
 EndIf
@@ -188,7 +203,6 @@ If ProcessExists("openvpn.exe") Then
    Exit
 else
 Local $hTimer = TimerInit()
-$ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 $Form1 = _Metro_CreateGUI($AppName, 250, 200, -1, -1, true,false)
 $Control_Buttons = _Metro_AddControlButtons(False,False,True,False,True)
 #$GUI_CLOSE_BUTTON = $Control_Buttons[0]
@@ -224,11 +238,17 @@ GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 TrayItemSetState ($iStatus, $TRAY_DISABLE)
 TrayCreateItem("") ; Create a separator line.
        Local $iOpen = TrayCreateItem("Open")
-	   Local $iOpenChat = TrayCreateItem("Chat")
+	   	   If $AuthSetting >0 then
+	   	   Local $iLogin = TrayCreateItem("Login")
+		  Else
+	   	   Local $iLogin = ""
+		   EndIf
 	   If $ChatSetting >0 then
-			 TrayItemSetState ($iOpenChat, $TRAY_ENABLE)
-	Else
-	   		 TrayItemSetState ($iOpenChat, $TRAY_DISABLE)
+		 Local $iOpenChat = TrayCreateItem("Chat")
+		 TrayItemSetState ($iOpenChat, $TRAY_ENABLE)
+		  Else
+		 Local $iOpenChat = ""
+		 TrayItemSetState ($iOpenChat, $TRAY_DISABLE)
 EndIf
 
 	   TrayCreateItem("") ; Create a separator line.
@@ -247,7 +267,7 @@ EndIf
    $AutoConnectSetting = IniRead($SettingsFile, "Settings", "AutoConnect", "")
 If $AutoConnectSetting >0 then
 		 TrayItemSetState ($iAutoConnect, $TRAY_CHECKED)
-		 Run(@ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --config .\config\client.ovpn", "", @SW_HIDE)
+		 Run($Connect, "", @SW_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
 		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
 		 TraySetState(1)
@@ -356,7 +376,7 @@ While 1
             ShellExecute("http://playhide.tk")
 
 		 Case $ButtonConnect
-		 Run(@ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --config .\config\client.ovpn", "", @SW_HIDE)
+		 Run($Connect, "", @SW_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
 		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
 		 sleep(500)
@@ -457,7 +477,32 @@ EndIf
 			   _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Auto Connect is on! (Change after Restart)")
 				_GUIDisable($Form1)
 			 EndIf
-
+			 Case $iLogin
+			$ReadUsername = FileReadLine($LoginFile,1)
+			$ReadPasswort = FileReadLine($LoginFile,2)
+			$Username = _Metro_InputBox2("Username", 15, $ReadUsername, False, False)
+			$Passwort = _Metro_InputBox2("Password", 15, $ReadPasswort, true, False)
+			_GUIDisable($Form1)
+			$file = FileOpen($LoginFile, 2)
+			FileFlush($file)
+			FileWrite($file, $Username & @CRLF)
+			FileWrite($file, $Passwort)
+			FileClose($file)
+			ProcessClose("openvpn.exe")
+			sleep(500)
+			Run($Connect, "", @SW_HIDE)
+						sleep(3000)
+									if Not ProcessExists("openvpn.exe") Then
+			   _GUIDisable($Form1, 0, 30)
+			   _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "Login wrong!")
+			   _GUIDisable($Form1)
+			EndIf
+			ProcessClose("openvpn.exe")
+			GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
+			GUICtrlSetState($ButtonConnect, $GUI_HIDE)
+			GUICtrlSetState($ButtonConnect, $GUI_SHOW)
+			GUICtrlSetData($LabelShowIP,"Not connected")
+			TrayItemSetText($iStatus, "Not connected")
    Case $iOpen
 ConsoleWrite("up" & @CRLF)
 $ok = GUISetState(@SW_SHOW)
