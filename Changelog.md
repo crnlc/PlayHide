@@ -100,3 +100,9 @@
 ### Version 3.8
 - Fixed sleep UI to dentermine IP
 - Single Instance Check
+
+
+### Version 3.9
+- First Setup possible with other Server (Custom Server Support)
+- Determine IP by DHCP-Server (Custom Server Support) 
+- Ping Client
