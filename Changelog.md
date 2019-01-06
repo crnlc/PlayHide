@@ -109,5 +109,5 @@
 
 ### Version 4.0
 - More adjustments in server.ini
-- Auth/Login Mode possible (Custom Server with seperat Login)
+- Auth/Login Mode possible (Custom Server with separat Login)
 - Proxy Setting in config added
