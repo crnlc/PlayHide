@@ -106,3 +106,8 @@
 - First Setup possible with other Server (Custom Server Support)
 - Determine IP by DHCP-Server (Custom Server Support) 
 - Ping Client
+
+### Version 4.0
+- More adjustments in server.ini
+- Auth/Login Mode possible (Custom Server with seperat Login)
+- Proxy Setting in config added
