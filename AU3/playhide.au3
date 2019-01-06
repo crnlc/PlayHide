@@ -27,11 +27,58 @@ Global $ServerList = @ScriptDir & "\config\servers.ini"
 Global $ServerSaved = IniRead($SettingsFile, "Settings", "Server", "")
 Global $ServerIP = IniRead($ServerList, $ServerSaved, "IP", "")
 Global $ServerPort = IniRead($ServerList, $ServerSaved, "Port", "")
+Global $ServerSubnet = IniRead($ServerList, $ServerSaved, "Subnet", "")
 TraySetState(16)
 TraySetToolTip ($AppName)
 Local $sFile = "icon.ico"
 TraySetIcon($sFile)
 _SetTheme("DarkPlayHide")
+
+Func _Metro_InputBox2($Promt, $Font_Size = 11, $DefaultText = "", $PW = False, $EnableEnterHotkey = True, $ParentGUI = "")
+	Local $Metro_Input, $Metro_Input_GUI
+	If $ParentGUI = "" Then
+		$Metro_Input_GUI = _Metro_CreateGUI($Promt, 460, 170, -1, -1, False)
+	Else
+		$Metro_Input_GUI = _Metro_CreateGUI(WinGetTitle($ParentGUI, "") & ".Input", 460, 170, -1, -1, False, $ParentGUI)
+	EndIf
+	_Metro_SetGUIOption($Metro_Input_GUI, True)
+	GUICtrlCreateLabel($Promt, 3 * $gDPI, 3 * $gDPI, 454 * $gDPI, 60 * $gDPI, BitOR(0x1, 0x0200), 0x00100000)
+	GUICtrlSetFont(-1, $Font_Size, 400, 0, "Segoe UI")
+	GUICtrlSetColor(-1, $FontThemeColor)
+	If $PW Then
+		$Metro_Input = GUICtrlCreateInput($DefaultText, 16 * $gDPI, 75 * $gDPI, 429 * $gDPI, 28 * $gDPI, 32)
+	Else
+		$Metro_Input = GUICtrlCreateInput($DefaultText, 16 * $gDPI, 75 * $gDPI, 429 * $gDPI, 28 * $gDPI)
+	EndIf
+	GUICtrlSetFont(-1, 11, 500, 0, "Segoe UI")
+
+	GUICtrlSetState($Metro_Input, 256)
+	Local $cEnter = GUICtrlCreateDummy()
+	Local $aAccelKeys[1][2] = [["{ENTER}", $cEnter]]
+	Local $Button_Continue = _Metro_CreateButtonEx2("OK", 170, 120, 100, 36, $ButtonBKColor, $ButtonTextColor, "Segoe UI")
+	GUICtrlSetState($Button_Continue, 512)
+
+	GUISetState(@SW_SHOW)
+
+	If $EnableEnterHotkey Then
+		GUISetAccelerators($aAccelKeys, $Metro_Input_GUI)
+	EndIf
+
+	If $mOnEventMode Then Opt("GUIOnEventMode", 0) ;Temporarily deactivate oneventmode
+
+	While 1
+		$input_nMsg = GUIGetMsg()
+		Switch $input_nMsg
+			Case $Button_Continue, $cEnter
+				Local $User_Input = GUICtrlRead($Metro_Input)
+				If Not ($User_Input = "") Then
+					_Metro_GUIDelete($Metro_Input_GUI)
+					If $mOnEventMode Then Opt("GUIOnEventMode", 1) ;Reactivate oneventmode
+					Return $User_Input
+				EndIf
+		EndSwitch
+	WEnd
+ EndFunc   ;==>_Metro_InputBox
 
 Func _IPDetails()
     Local $oWMIService = ObjGet('winmgmts:{impersonationLevel = impersonate}!\\' & '.' & '\root\cimv2')
@@ -141,7 +188,6 @@ If ProcessExists("openvpn.exe") Then
    Exit
 else
 Local $hTimer = TimerInit()
-Local $hTimer2 = TimerInit()
 $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 $Form1 = _Metro_CreateGUI($AppName, 250, 200, -1, -1, true,false)
 $Control_Buttons = _Metro_AddControlButtons(False,False,True,False,True)
@@ -164,8 +210,7 @@ GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 $ButtonConnect = _Metro_CreateButtonEx2("Connect", 70, 85, 99, 50, $ButtonBKColor)
 $ButtonDisconnect = _Metro_CreateButtonEx2("Disconnect", 70, 85, 99, 50, $ButtonBKColor)
 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
-$ReadServer = IniRead($SettingsFile, "Settings", "Server", "")
-$ShowServerLabel = GUICtrlCreateLabel("Server: " & $ReadServer, 150, 170, 300, 30)
+$ShowServerLabel = GUICtrlCreateLabel("Server: " & $ServerSaved, 150, 170, 300, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -264,9 +309,7 @@ While 1
 	  IniWrite($SettingsFile, "Settings", "Server", $ChooserPick)
 	      _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Server switched, PlayHide restart now!")
 				_GUIDisable($GUIServer)
-		 #GUICtrlSetState($Chooser, $GUI_HIDE)
 		 _Metro_GUIDelete($GUIServer)
-		 #ExitLoop
 		 ProcessClose("openvpn.exe")
 		 RestartScript()
 		 Exit
@@ -285,6 +328,17 @@ Func Users()
         $dOlddata = $dData
 	 EndIf
     Return $sData
+ EndFunc
+
+Func _Ping()
+   $Ping = _Metro_InputBox2("Ping Client", 15, "1", False, False)
+    Local $iPing = Ping($ServerSubnet & $Ping, 600)
+
+    If $iPing Then ; If a value greater than 0 was returned then display the following message.
+	  _Metro_MsgBox($MB_SYSTEMMODAL, "Success", "Client pinged in " & $iPing & "ms.")
+    Else
+	  _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "No Client Ping was possible")
+	 EndIf
  EndFunc
 
 While 1
@@ -329,12 +383,19 @@ EndIf
 		Case $GUI_MENU_BUTTON
 		 #$Users = 'User Online: ' & Users()
 		 #$Users = 'User Online: 0'
-		 Local $MenuButtonsArray[5] = ["Servers", "Close"]
+		 Local $MenuButtonsArray[5] = ["Servers", "Ping", "Close"]
 			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
 			Switch $MenuSelect
 			   Case "0"
 					 ServerList()
-				Case "1"
+				  Case "1"
+			   If ProcessExists("openvpn.exe") Then
+					 _Ping()
+				  Else
+		 _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "Connect first!")
+		 EndIf
+
+				Case "2"
 					 ProcessClose("openvpn.exe")
 					_Metro_GUIDelete($Form1)
 					Exit
@@ -415,7 +476,6 @@ ConsoleWrite($ok & @CRLF)
 	  Else
 GUICtrlSetData($LabelShowIP,"Not connected")
 TrayItemSetText($iStatus, "Not connected")
-#TrayTip("ERROR", "Connection is no longer active!", 3, $TIP_ICONASTERISK)
 	  EndIf
 	  		 Local $hTimer = TimerInit()
     EndIf
