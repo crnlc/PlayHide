@@ -82,7 +82,7 @@ Func _Metro_InputBox2($Promt, $Font_Size = 11, $DefaultText = "", $PW = False, $
 
 Func _IPDetails()
     Local $oWMIService = ObjGet('winmgmts:{impersonationLevel = impersonate}!\\' & '.' & '\root\cimv2')
-    Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where DNSDomain="vpn"', 'WQL', 0x30), $aReturn[5] = [0]
+    Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where DHCPServer="' & $ServerSubnet & '1"', 'WQL', 0x30), $aReturn[5] = [0]
     If IsObj($oColItems) Then
         For $oObjectItem In $oColItems
             If $oObjectItem.IPAddress(0) == @IPAddress1 Then
@@ -154,10 +154,10 @@ If Not FileExists("login.txt") then
 			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
 			$Setup = _Metro_MsgBox(0, "First run", "Setup required! Takes 30 Sec after TAP Installer")
 			RunWait('driver\tap.exe')
-			Run(@ComSpec & " /c " & "bin32\openvpn.exe --remote " & "vpn.playhide.tk" & " " & "1400" & " --config .\config\client.ovpn", "", @SW_HIDE)
+			Run(@ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --config .\config\client.ovpn", "", @SW_HIDE)
 						_Metro_MsgBox(0, "Info", "Now we testing the Network and configure some more!")
 			Sleep(15000)
-			If ProcessExists("openvpn.exe") And Ping("10.5.1.1") Then
+			If ProcessExists("openvpn.exe") And Ping($ServerSubnet & "1") Then
 			Sleep(100)
 			RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1"', "", @SW_HIDE)
 			RunWait('netsh interface ipv4 set interface "PlayHide VPN" metric=1')
