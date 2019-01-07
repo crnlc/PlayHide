@@ -31,6 +31,7 @@ Global $ServerPort = IniRead($ServerList, $ServerSaved, "Port", "")
 Global $ServerProto = IniRead($ServerList, $ServerSaved, "Protocol", "")
 Global $ServerDev = IniRead($ServerList, $ServerSaved, "Interface", "")
 Global $ServerSubnet = IniRead($ServerList, $ServerSaved, "Subnet", "")
+Global $ServerDHCP = IniRead($ServerList, $ServerSaved, "DHCP_Server", "")
 Global $ServerCA = IniRead($ServerList, $ServerSaved, "Cert", "")
 Global $Connect = @ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --ca .\certs\" & $ServerCA & " --dev " & $ServerDev & " --proto " & $ServerProto & " --config .\config\client.ovpn"
 Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
@@ -138,7 +139,7 @@ Func _Metro_InputBox2($Promt, $Font_Size = 11, $DefaultText = "", $PW = False, $
 
 Func _IPDetails()
     Local $oWMIService = ObjGet('winmgmts:{impersonationLevel = impersonate}!\\' & '.' & '\root\cimv2')
-    Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where DHCPServer="' & $ServerSubnet & '1"', 'WQL', 0x30), $aReturn[5] = [0]
+    Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where DHCPServer="' & $ServerDHCP & '"', 'WQL', 0x30), $aReturn[5] = [0]
     If IsObj($oColItems) Then
         For $oObjectItem In $oColItems
             If $oObjectItem.IPAddress(0) == @IPAddress1 Then
