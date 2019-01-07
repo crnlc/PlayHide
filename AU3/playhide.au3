@@ -22,6 +22,8 @@ Opt("TrayMenuMode",3)
 $AppName = "PlayHide VPN"
 Global $LoginFile = @ScriptDir & "\login.txt"
 Global $SettingsFile = @ScriptDir & "\Settings.ini"
+Global $Language = IniRead($SettingsFile, "Settings", "Language", "")
+Global $LanguageFile = @ScriptDir & "\lang\" & $Language & ".ini"
 Global $ServerList = @ScriptDir & "\config\servers.ini"
 Global $ServerSaved = IniRead($SettingsFile, "Settings", "Server", "")
 Global $ServerIP = IniRead($ServerList, $ServerSaved, "IP", "")
@@ -33,6 +35,11 @@ Global $ServerCA = IniRead($ServerList, $ServerSaved, "Cert", "")
 Global $Connect = @ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --ca .\certs\" & $ServerCA & " --dev " & $ServerDev & " --proto " & $ServerProto & " --config .\config\client.ovpn"
 Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 Global $AuthSetting = IniRead($SettingsFile, "Settings", "Auth", "")
+
+### Language Strings
+Global $String_OK = IniRead($LanguageFile, "Strings", "OK", "")
+
+
 TraySetState(16)
 TraySetToolTip ($AppName)
 Local $sFile = "icon.ico"
