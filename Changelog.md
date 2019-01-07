@@ -111,3 +111,9 @@
 - More adjustments in server.ini
 - Auth/Login Mode possible (Custom Server with separat Login)
 - Proxy Setting in config added
+
+### Version 4.1
+- Language Support
+- Auto Update could enable / disable
+- DHCP-Server could be set in server.ini (Custom Server)
+- Bugfixes
