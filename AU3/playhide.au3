@@ -406,8 +406,8 @@ Func _Ping()
    $Ping = _Metro_InputBox2("Ping Client", 15, "1", False, False)
     Local $iPing = Ping($ServerSubnet & $Ping, 600)
 
-    If $iPing Then 
-	  _Metro_MsgBox($MB_SYSTEMMODAL, $String_s, $String_client_ping & $iPing & "ms.")
+    If $iPing Then
+	  _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_client_ping & $iPing & "ms.")
     Else
 	  _Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_client_ping_failed)
 	 EndIf
@@ -485,7 +485,7 @@ EndIf
 			if Not ProcessExists("chat.exe") then
 			run("bin32\chat.exe")
 			else
-   		   			_GUIDisable($Form1, 0, 30) 
+   		   			_GUIDisable($Form1, 0, 30)
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_error, "Chat is already running!")
 				_GUIDisable($Form1)
 			 EndIf
@@ -495,37 +495,37 @@ EndIf
 
 		 Case $iDesktopIcon
 			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
-			FileCreateShortcut(@AutoItExe, @DesktopDir & "\PlayHide VPN.lnk", @ScriptDir) 
-			_GUIDisable($Form1, 0, 30) 
+			FileCreateShortcut(@AutoItExe, @DesktopDir & "\PlayHide VPN.lnk", @ScriptDir)
+			_GUIDisable($Form1, 0, 30)
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_shortcut_info)
 			_GUIDisable($Form1)
 					 else
-			_GUIDisable($Form1, 0, 30) 
+			_GUIDisable($Form1, 0, 30)
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_shortcut_info2)
 			_GUIDisable($Form1)
 		 EndIf
 
 					 Case $iAutostart
 			if Not FileExists(@StartupDir & "\" & $AppName & ".lnk") Then
-			FileCreateShortcut(@AutoItExe, @StartupDir & "\PlayHide.lnk", @ScriptDir) 
-			_GUIDisable($Form1, 0, 30) 
+			FileCreateShortcut(@AutoItExe, @StartupDir & "\PlayHide.lnk", @ScriptDir)
+			_GUIDisable($Form1, 0, 30)
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_autostart_info)
 			_GUIDisable($Form1)
 		 else
 			FileDelete(@StartupDir & "\PlayHide.lnk")
-			_GUIDisable($Form1, 0, 30) 
+			_GUIDisable($Form1, 0, 30)
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_autostart_info2)
 			_GUIDisable($Form1)
 			EndIf
 		  Case $iAutoConnect
 			 if $AutoConnectSetting >0 Then
 			   IniWrite($SettingsFile, "Settings", "AutoConnect", "0")
-			   _GUIDisable($Form1, 0, 30) 
+			   _GUIDisable($Form1, 0, 30)
 			   _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_autoconnect_info)
 				_GUIDisable($Form1)
 			 else
 				 IniWrite($SettingsFile, "Settings", "AutoConnect", "1")
-				 			      		   			_GUIDisable($Form1, 0, 30) 
+				 			      		   			_GUIDisable($Form1, 0, 30)
 			   _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_autoconnect_info2)
 				_GUIDisable($Form1)
 			 EndIf
