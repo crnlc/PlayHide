@@ -65,7 +65,9 @@ Global $String_login = IniRead($LanguageFile, "Strings", "login", "")
 Global $String_exit = IniRead($LanguageFile, "Strings", "exit", "")
 Global $String_close = IniRead($LanguageFile, "Strings", "close", "")
 Global $String_apply = IniRead($LanguageFile, "Strings", "apply", "")
+Global $String_language = IniRead($LanguageFile, "Strings", "language", "")
 Global $String_server_switched = IniRead($LanguageFile, "Strings", "server_switched", "")
+Global $String_lang_switched = IniRead($LanguageFile, "Strings", "lang_switched", "")
 Global $String_client_ping = IniRead($LanguageFile, "Strings", "client_ping", "")
 Global $String_client_ping_failed = IniRead($LanguageFile, "Strings", "client_ping_failed", "")
 Global $String_client_ping_info = IniRead($LanguageFile, "Strings", "client_ping_info", "")
@@ -88,8 +90,8 @@ TraySetState(16)
 TraySetToolTip ($AppName)
 Local $sFile = "icon.ico"
 TraySetIcon($sFile)
-#_SetTheme("DarkPlayHide")
-_SetTheme("DarkTealV2")
+_SetTheme("DarkPlayHide")
+#_SetTheme("DarkTealV2")
 
 Func _Metro_InputBox2($Promt, $Font_Size = 11, $DefaultText = "", $PW = False, $EnableEnterHotkey = True, $ParentGUI = "")
 	Local $Metro_Input, $Metro_Input_GUI
@@ -367,9 +369,8 @@ Func ServerList()
 			$GUIServer = _Metro_CreateGUI($AppName, 160, 80, -1, -1, false,false)
 			$ContentList = IniReadSectionNames($ServerList)
 			$Chooser = GUICtrlCreateCombo("", 30, 15, 99, 25, BitOR($CBS_DROPDOWNLIST,$CBS_AUTOHSCROLL))
-			#$ServerLocation = IniRead($ServerList, , "IP", "")
 			GUICtrlSetData($Chooser, _ArraytoString($ContentList, "|", 1), $ContentList[1])
-			$ButtonServerOK = _Metro_CreateButtonEx2($String_apply, 50, 40, 50, 30, $ButtonBKColor)
+			$ButtonServerOK = _Metro_CreateButtonEx2($String_apply, 40, 40, 80, 30, $ButtonBKColor)
 			GUICtrlSetState($Chooser, $GUI_SHOW)
 			GUISetState(@SW_SHOW, $GUIServer)
 
@@ -380,6 +381,34 @@ While 1
 	  $ChooserPick = GUICtrlRead($Chooser)
 	  IniWrite($SettingsFile, "Settings", "Server", $ChooserPick)
 	      _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_server_switched)
+				_GUIDisable($GUIServer)
+		 _Metro_GUIDelete($GUIServer)
+		 ProcessClose("openvpn.exe")
+		 RestartScript()
+		 Exit
+	  EndSwitch
+	  WEnd
+   EndFunc
+
+Func LanguageList()
+			$GUIServer = _Metro_CreateGUI($AppName, 160, 80, -1, -1, false,false)
+			#$ContentList = IniReadSectionNames($ServerList)
+			$English = "en"
+			$German = "de"
+			$LangList = $German & "|" & $English
+			$Chooser = GUICtrlCreateCombo("", 30, 15, 99, 25, BitOR($CBS_DROPDOWNLIST,$CBS_AUTOHSCROLL))
+			GUICtrlSetData($Chooser, $LangList,$English)
+			$ButtonServerOK = _Metro_CreateButtonEx2($String_apply, 40, 40, 80, 30, $ButtonBKColor)
+			GUICtrlSetState($Chooser, $GUI_SHOW)
+			GUISetState(@SW_SHOW, $GUIServer)
+
+While 1
+    $nMsg = GUIGetMsg()
+    Switch $nMsg
+	Case $ButtonServerOK
+	  $ChooserPick = GUICtrlRead($Chooser)
+	  IniWrite($SettingsFile, "Settings", "Language", $ChooserPick)
+	      _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_lang_switched)
 				_GUIDisable($GUIServer)
 		 _Metro_GUIDelete($GUIServer)
 		 ProcessClose("openvpn.exe")
@@ -455,19 +484,21 @@ EndIf
 		Case $GUI_MENU_BUTTON
 		 #$Users = 'User Online: ' & Users()
 		 #$Users = 'User Online: 0'
-		 Local $MenuButtonsArray[5] = ["Servers", "Ping", $String_close]
+		 Local $MenuButtonsArray[5] = ["Servers", $String_language, "Ping", $String_close]
 			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
 			Switch $MenuSelect
 			   Case "0"
 					 ServerList()
-				  Case "1"
+			   Case "1"
+					 LanguageList()
+				  Case "2"
 			   If ProcessExists("openvpn.exe") Then
 					 _Ping()
 				  Else
 		 _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_client_ping_info)
 		 EndIf
 
-				Case "2"
+				Case "3"
 					 ProcessClose("openvpn.exe")
 					_Metro_GUIDelete($Form1)
 					Exit
