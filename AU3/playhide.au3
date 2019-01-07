@@ -235,12 +235,12 @@ else
 			RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1"', "", @SW_HIDE)
 			RunWait('netsh interface ipv4 set interface "PlayHide VPN" metric=1')
 			ProcessClose("openvpn.exe")
-			_Metro_MsgBox($MB_SYSTEMMODAL, $setup_success, $String_setup_success_msg)
+			_Metro_MsgBox($MB_SYSTEMMODAL, $String_setup_success, $String_setup_success_msg)
 			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
 			FileCreateShortcut(@AutoItExe, @DesktopDir & "\" & $AppName & ".lnk", @ScriptDir)
 		 else
 		 EndIf
-		 RestartScript()
+		 		 RestartScript()
 			Exit
 		 else
 			    _Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_setup_failed)
