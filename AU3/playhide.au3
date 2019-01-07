@@ -23,6 +23,7 @@ $AppName = "PlayHide VPN"
 Global $LoginFile = @ScriptDir & "\login.txt"
 Global $SettingsFile = @ScriptDir & "\Settings.ini"
 Global $Language = IniRead($SettingsFile, "Settings", "Language", "")
+Global $CheckUpdateSetting = IniRead($SettingsFile, "Settings", "CheckUpdate", "")
 Global $LanguageFile = @ScriptDir & "\lang\" & $Language & ".ini"
 Global $ServerList = @ScriptDir & "\config\servers.ini"
 Global $ServerSaved = IniRead($SettingsFile, "Settings", "Server", "")
@@ -167,6 +168,8 @@ $oldVersion = IniRead("updater.ini","Version","Version","NotFound")
 $newVersion = "0.0"
 $Ini = InetGet($VersionsInfo,@ScriptDir & "\version.ini") ;download version.ini
 
+If $CheckUpdateSetting >0 then
+
 If $Ini = 0 Then ;was the download of version.ini successful?
 Else
     $newVersion = IniRead (@ScriptDir & "\version.ini","Version","Version","") ;reads the new version out of version.ini
@@ -192,14 +195,15 @@ Else
             InetClose($dlhandle)
             EndIf
     EndIf
-EndIf
+ EndIf
+    EndIf
+
 FileDelete(@ScriptDir & "\version.ini")
 If FileExists("PlayHide.7z") then
 			Run(@ComSpec & " /c " & "update.exe" , "", @SW_HIDE)
-
    exit
 else
-If Not FileExists("login.txt") then
+If Not FileExists($LoginFile) then
    If Not IsAdmin() Then
 			_Metro_MsgBox(0, $String_error, $String_start_msg)
 						Exit
