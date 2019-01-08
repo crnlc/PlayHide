@@ -34,7 +34,8 @@ Global $ServerDev = IniRead($ServerList, $ServerSaved, "Interface", "")
 Global $ServerSubnet = IniRead($ServerList, $ServerSaved, "Subnet", "")
 Global $ServerDHCP = IniRead($ServerList, $ServerSaved, "DHCP_Server", "")
 Global $ServerCA = IniRead($ServerList, $ServerSaved, "Cert", "")
-Global $Connect = @ComSpec & " /c " & "bin32\openvpn.exe --remote " & $ServerIP & " " & $ServerPort & " --ca .\certs\" & $ServerCA & " --dev " & $ServerDev & " --proto " & $ServerProto & " --config .\config\client.ovpn"
+Global $Params = "--client --nobind --resolv-retry infinite --persist-key --persist-tun --auth-user-pass login.txt --auth-nocache --remote-cert-tls server --verb 0 --mute-replay-warnings --config .\config\client.ovpn"
+Global $Connect = @ComSpec & " /c " & "bin32\openvpn.exe " & $Params & " --remote " & $ServerIP & " " & $ServerPort & " --ca .\certs\" & $ServerCA & " --dev " & $ServerDev & " --proto " & $ServerProto
 Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 Global $AuthSetting = IniRead($SettingsFile, "Settings", "Auth", "")
 
