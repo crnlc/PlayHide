@@ -3,7 +3,7 @@
 Build with Autoit & host in EU
 
 ![Screenshot](https://github.com/DoM1niC/PlayHide/blob/master/res/client.png?raw=true)
-
+![Screenshot](https://github.com/DoM1niC/PlayHide/raw/master/res/network-scanner.png?raw=true)
 ## Features
 - Play Games with LAN mode
 - Share private files
