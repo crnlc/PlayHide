@@ -54,6 +54,7 @@ Global $String_setup_msg = IniRead($LanguageFile, "Strings", "setup_msg", "")
 Global $String_setup_msg2 = IniRead($LanguageFile, "Strings", "setup_msg2", "")
 Global $String_setup_success = IniRead($LanguageFile, "Strings", "setup_success", "")
 Global $String_setup_success_msg = IniRead($LanguageFile, "Strings", "setup_success_msg", "")
+Global $String_setup_failed = IniRead($LanguageFile, "Strings", "setup_failed", "")
 Global $String_start_msg = IniRead($LanguageFile, "Strings", "start_msg", "")
 Global $String_start_msg2 = IniRead($LanguageFile, "Strings", "start_msg2", "")
 Global $String_start_msg3 = IniRead($LanguageFile, "Strings", "start_msg3", "")
@@ -85,7 +86,6 @@ Global $String_autostart_info2 = IniRead($LanguageFile, "Strings", "autostart_in
 Global $String_autoconnect = IniRead($LanguageFile, "Strings", "autoconnect", "")
 Global $String_autoconnect_info = IniRead($LanguageFile, "Strings", "autoconnect_info", "")
 Global $String_autoconnect_info2 = IniRead($LanguageFile, "Strings", "autoconnect_info2", "")
-
 
 
 TraySetState(16)
@@ -236,7 +236,7 @@ else
 			RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1"', "", @SW_HIDE)
 			RunWait('netsh interface ipv4 set interface "PlayHide VPN" metric=1')
 			ProcessClose("openvpn.exe")
-			_Metro_MsgBox($MB_SYSTEMMODAL, $String_setup_success, $String_setup_success_msg)
+			_Metro_MsgBox($MB_SYSTEMMODAL, $String_success, $String_setup_success_msg)
 			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
 			FileCreateShortcut(@AutoItExe, @DesktopDir & "\" & $AppName & ".lnk", @ScriptDir)
 		 else
