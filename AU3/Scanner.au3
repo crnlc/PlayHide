@@ -27,6 +27,8 @@ TCPStartup()
 _Metro_EnableHighDPIScaling()
 Local $sFile = "icon.ico"
 _SetTheme("DarkPlayHide")
+#_SetTheme("DarkTealV2")
+
 $Appname = "PlayHide VPN - Network Scan"
 if _Singleton($Appname, 1) = 0 Then
 	       _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "Scanner already run!")
@@ -76,18 +78,21 @@ If $Found > 1 Then ; if there is more than one network available you will be pro
 Else ; if only one network is available, skip the selection GUI and go
 	If $LocalIP1 <> "0.0.0.0" Then $ChosenIP = $LocalIP1
 EndIf
-$GUI = _Metro_CreateGUI("Network Scan", 340, 380, -1, -1, true,false)
+$GUI = _Metro_CreateGUI("Network Scan", 340, 360, -1, -1, true,false)
 $Control_Buttons = _Metro_AddControlButtons(True,False,False,False,False)
 $GUI_CLOSE_BUTTON = $Control_Buttons[0]
-$Rescan = _Metro_CreateButtonEx2("Rescan", 130, 15, 90, 30, $ButtonBKColor)
-$CopyToClip = _Metro_CreateButtonEx2("Copy IP", 10, 15, 100, 30, $ButtonBKColor)
-$Used = _GUICtrlListView_Create($GUI, "IP Address|Hostname|Ping", 10, 55, 315, 280)
- _GUICtrlListView_SetBkColor($Used, 0x191919)
-
-_GUICtrlListView_SetColumnWidth($Used, 0, 95)
-_GUICtrlListView_SetColumnWidth($Used, 1, 169)
-_GUICtrlListView_SetColumnWidth($Used, 2, 50)
-Local $StatusParts[4] = [250, 510, -1]
+GUICtrlCreateLabel($AppName, 10, 7, 300, 30)
+GUICtrlSetFont(-1, 11, Default, Default, "Segoe UI Light", 5)
+GUICtrlSetColor(-1, 0xFFFFFF)
+GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+$Rescan = _Metro_CreateButtonEx2("Rescan", 240, 40, 90, 30, $ButtonBKColor)
+$CopyToClip = _Metro_CreateButtonEx2("Copy IP", 10, 40, 100, 30, $ButtonBKColor)
+$Used = _GUICtrlListView_Create($GUI, "IP Address|Hostname|Ping", 10, 85, 320, 250)
+#_GUICtrlListView_SetBkColor($Used, 0x191919)
+_GUICtrlListView_SetColumnWidth($Used, 0, 80)
+_GUICtrlListView_SetColumnWidth($Used, 1, 180)
+_GUICtrlListView_SetColumnWidth($Used, 2, 60)
+ _GUICtrlListView_SetOutlineColor($Used, 0xffffff)
 Local $AccelKeys[8][2] = [["^c", $CopyToClip],["^n", $Rescan]]
 GUISetAccelerators($AccelKeys)
 GUISetState(@SW_SHOW, $GUI)
@@ -180,9 +185,10 @@ Func _Scan()
 					If($PingTime <> -1) Then
 						_GUICtrlListView_AddItem($Used, $ShowHost[1] & "." & $ShowHost[2] & "." & $ShowHost[3] & "." & $LastOct, $CurrentIndex)
 						_GUICtrlListView_AddSubItem($Used, $CurrentIndex, $PingTime & "ms", 2)
-						_GUICtrlListView_AddSubItem($Used, $CurrentIndex, "scan hostname.....", 1)
+						_GUICtrlListView_AddSubItem($Used, $CurrentIndex, "Scan Client.....", 1)
 						$HostName = _HostName($CurrentIP)
 						_GUICtrlListView_AddSubItem($Used, $CurrentIndex, $HostName, 1)
+			
 						$CurrentIndex += 1
 					Else
 						$FreeCount += 1
@@ -214,11 +220,11 @@ Func _CopyToClip()
 		$FinalIP = $Oct[1] & "." & $Oct[2] & "." & $Oct[3] & "." & $Last
 		_ClipBoard_SetData($FinalIP)
 				  _Metro_MsgBox($MB_SYSTEMMODAL, "Info", "IP address " & $FinalIP & " sent to clipboard")
-				  				_GUIDisable($GUI)
+				  _GUIDisable($GUI)
 
 	Else
-					_Metro_MsgBox($MB_SYSTEMMODAL, "Error", "You have not selected an IP address yet.")
-				_GUIDisable($GUI)
+				 _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "You have not selected an IP address yet.")
+				 _GUIDisable($GUI)
 	EndIf
  EndFunc   ;==>_CopyToClip
 
