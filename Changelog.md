@@ -117,3 +117,8 @@
 - Auto Update could enable / disable
 - DHCP-Server could be set in server.ini (Custom Server)
 - Bugfixes
+
+### Version 4.2
+- Network Browser / Scanner added
+- Config / Login could be set in server.ini (Custom Server)
+- Bugfixes
