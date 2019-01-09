@@ -20,7 +20,7 @@ DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
 _Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
 $AppName = "PlayHide VPN"
-Global $LoginFile = @ScriptDir & "\login.txt"
+#Global $LoginFile = @ScriptDir & "\login.txt"
 Global $SettingsFile = @ScriptDir & "\Settings.ini"
 Global $Language = IniRead($SettingsFile, "Settings", "Language", "")
 Global $CheckUpdateSetting = IniRead($SettingsFile, "Settings", "CheckUpdate", "")
@@ -34,8 +34,11 @@ Global $ServerDev = IniRead($ServerList, $ServerSaved, "Interface", "")
 Global $ServerSubnet = IniRead($ServerList, $ServerSaved, "Subnet", "")
 Global $ServerDHCP = IniRead($ServerList, $ServerSaved, "DHCP_Server", "")
 Global $ServerCA = IniRead($ServerList, $ServerSaved, "Cert", "")
-Global $Params = "--client --nobind --resolv-retry infinite --persist-key --persist-tun --auth-user-pass login.txt --auth-nocache --remote-cert-tls server --verb 0 --mute-replay-warnings --config .\config\client.ovpn"
-Global $Connect = @ComSpec & " /c " & "bin32\openvpn.exe " & $Params & " --remote " & $ServerIP & " " & $ServerPort & " --ca .\certs\" & $ServerCA & " --dev " & $ServerDev & " --proto " & $ServerProto
+Global $ServerConfig = IniRead($ServerList, $ServerSaved, "Config", "")
+Global $ServerLogin = IniRead($ServerList, $ServerSaved, "Login", "")
+Global $LoginFile = @ScriptDir & "\config\" & $ServerLogin
+Global $Params = "--client --nobind --resolv-retry infinite --persist-key --persist-tun --auth-nocache --remote-cert-tls server --verb 0 --mute-replay-warnings"
+Global $Connect = @ComSpec & " /c " & "bin32\openvpn.exe " & $Params & " --remote " & $ServerIP & " " & $ServerPort & " --ca .\certs\" & $ServerCA & " --dev " & $ServerDev & " --proto " & $ServerProto & " --config .\config\" & $ServerConfig & " --auth-user-pass " & $LoginFile
 Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 Global $AuthSetting = IniRead($SettingsFile, "Settings", "Auth", "")
 
@@ -86,6 +89,8 @@ Global $String_autostart_info2 = IniRead($LanguageFile, "Strings", "autostart_in
 Global $String_autoconnect = IniRead($LanguageFile, "Strings", "autoconnect", "")
 Global $String_autoconnect_info = IniRead($LanguageFile, "Strings", "autoconnect_info", "")
 Global $String_autoconnect_info2 = IniRead($LanguageFile, "Strings", "autoconnect_info2", "")
+Global $String_network = IniRead($LanguageFile, "Strings", "network", "")
+Global $String_scanner_msg = IniRead($LanguageFile, "Strings", "scanner_msg", "")
 
 
 TraySetState(16)
@@ -489,7 +494,7 @@ EndIf
 		Case $GUI_MENU_BUTTON
 		 #$Users = 'User Online: ' & Users()
 		 #$Users = 'User Online: 0'
-		 Local $MenuButtonsArray[5] = ["Servers", $String_language, "Ping", $String_close]
+		 Local $MenuButtonsArray[5] = ["Servers", $String_language, $String_network, $String_close]
 			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
 			Switch $MenuSelect
 			   Case "0"
@@ -497,10 +502,12 @@ EndIf
 			   Case "1"
 					 LanguageList()
 				  Case "2"
-			   If ProcessExists("openvpn.exe") Then
-					 _Ping()
-				  Else
-		 _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_client_ping_info)
+				if Not ProcessExists("chat.exe") then
+			run("bin32\network-scan.exe")
+			else
+   		   			_GUIDisable($Form1, 0, 30)
+			_Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_scanner_msg)
+				_GUIDisable($Form1)
 		 EndIf
 
 				Case "3"
