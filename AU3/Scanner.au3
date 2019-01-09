@@ -188,7 +188,7 @@ Func _Scan()
 						_GUICtrlListView_AddSubItem($Used, $CurrentIndex, "Scan Client.....", 1)
 						$HostName = _HostName($CurrentIP)
 						_GUICtrlListView_AddSubItem($Used, $CurrentIndex, $HostName, 1)
-			
+
 						$CurrentIndex += 1
 					Else
 						$FreeCount += 1
@@ -239,7 +239,8 @@ Func _PingSpecific($PingIP)
 		$Text &= $Line
 	WEnd
 	SplashOff()
-	MsgBox(64, "Result", $Text)
+   _Metro_MsgBox($MB_SYSTEMMODAL, "Result", $Text)
+   _GUIDisable($GUI)
 EndFunc   ;==>_PingSpecific
 
 Func _MSPing($CurrentIP, $Timeout = $TimeoutDefault)
