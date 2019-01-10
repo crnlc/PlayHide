@@ -16,7 +16,6 @@ split_into_parts()
 case $script_type in
 
 up)
-        dhclient -v tap3
 	NMSRVRS=""
 	SRCHS=""
 	for optionvarname in ${!foreign_option_*} ; do
@@ -42,7 +41,6 @@ up)
 
         ;;
 down)
-        dhclient -r tap3
 	/sbin/resolvconf -d "${dev}.openvpn"
         ;;
 esac
