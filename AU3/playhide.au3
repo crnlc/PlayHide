@@ -20,7 +20,6 @@ DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
 _Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
 $AppName = "PlayHide VPN"
-#Global $LoginFile = @ScriptDir & "\login.txt"
 Global $SettingsFile = @ScriptDir & "\Settings.ini"
 Global $Language = IniRead($SettingsFile, "Settings", "Language", "")
 Global $CheckUpdateSetting = IniRead($SettingsFile, "Settings", "CheckUpdate", "")
@@ -36,9 +35,9 @@ Global $ServerDHCP = IniRead($ServerList, $ServerSaved, "DHCP_Server", "")
 Global $ServerCA = IniRead($ServerList, $ServerSaved, "Cert", "")
 Global $ServerConfig = IniRead($ServerList, $ServerSaved, "Config", "")
 Global $ServerLogin = IniRead($ServerList, $ServerSaved, "Login", "")
-Global $LoginFile = @ScriptDir & "\config\" & $ServerLogin
+Global $LoginFile =  ".\config\" & $ServerLogin
 Global $Params = "--client --nobind --resolv-retry infinite --persist-key --persist-tun --auth-nocache --remote-cert-tls server --verb 0 --mute-replay-warnings"
-Global $Connect = @ComSpec & " /c " & "bin32\openvpn.exe " & $Params & " --remote " & $ServerIP & " " & $ServerPort & " --ca .\certs\" & $ServerCA & " --dev " & $ServerDev & " --proto " & $ServerProto & " --config .\config\" & $ServerConfig & " --auth-user-pass " & $LoginFile
+Global $Connect = @ComSpec & " /c " & 'bin32\openvpn.exe ' & $Params & ' --remote ' & $ServerIP & ' ' & $ServerPort & ' --ca .\certs\' & $ServerCA & ' --dev ' & $ServerDev & ' --proto ' & $ServerProto & ' --config .\config\' & $ServerConfig & ' --auth-user-pass ' & $LoginFile
 Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 Global $AuthSetting = IniRead($SettingsFile, "Settings", "Auth", "")
 
