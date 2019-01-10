@@ -122,3 +122,6 @@
 - Network Browser / Scanner added
 - Config / Login could be set in server.ini (Custom Server)
 - Bugfixes
+
+### Version 4.3
+- Bugfixes
