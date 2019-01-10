@@ -427,19 +427,6 @@ While 1
 	  WEnd
    EndFunc
 
-Func Users()
-   TimerInit()
-    Global $dOldData = ""
-    Local $dData = InetRead("http://vpn.playhide.tk/users_online.php")
-	sleep(500)
-	InetClose($dData)
-    Local $sData = BinaryToString($dData)
-	    If $dOlddata <> $dData Then
-        $dOlddata = $dData
-	 EndIf
-    Return $sData
- EndFunc
-
 Func _Ping()
    $Ping = _Metro_InputBox2("Ping Client", 15, "1", False, False)
     Local $iPing = Ping($ServerSubnet & $Ping, 600)
@@ -454,11 +441,6 @@ Func _Ping()
 While 1
     $nMsg = GUIGetMsg()
     Switch $nMsg
-	  #Case $GUI_EVENT_CLOSE, $GUI_CLOSE_BUTTON
-		 #ProcessClose("openvpn.exe")
-		 #_Metro_GUIDelete($Form1)
-		 #Exit
-
 			   Case $GUI_MINIMIZE_BUTTON
 			   TraySetState(1)
 			   GUISetState(@SW_HIDE, $Form1)
@@ -491,8 +473,6 @@ EndIf
 				  TrayItemSetText($iStatus, $String_not_connected)
 
 		Case $GUI_MENU_BUTTON
-		 #$Users = 'User Online: ' & Users()
-		 #$Users = 'User Online: 0'
 		 Local $MenuButtonsArray[5] = ["Servers", $String_language, $String_network, $String_close]
 			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
 			Switch $MenuSelect
@@ -501,14 +481,7 @@ EndIf
 			   Case "1"
 					 LanguageList()
 				  Case "2"
-				if Not ProcessExists("chat.exe") then
-			run("bin32\network-scan.exe")
-			else
-   		   			_GUIDisable($Form1, 0, 30)
-			_Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_scanner_msg)
-				_GUIDisable($Form1)
-		 EndIf
-
+			   run(".\bin32\network-scan.exe")
 				Case "3"
 					 ProcessClose("openvpn.exe")
 					_Metro_GUIDelete($Form1)
@@ -524,13 +497,6 @@ EndIf
 		 Exit
 
 	  Case $iOpenChat
-			if Not ProcessExists("chat.exe") then
-			run("bin32\chat.exe")
-			else
-   		   			_GUIDisable($Form1, 0, 30)
-			_Metro_MsgBox($MB_SYSTEMMODAL, $String_error, "Chat is already running!")
-				_GUIDisable($Form1)
-			 EndIf
 
 		  Case $iWebsite
 			   ShellExecute("http://playhide.tk")
