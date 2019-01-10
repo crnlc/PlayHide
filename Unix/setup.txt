@@ -1,12 +1,13 @@
 PlayHide VPN Setup Linux
 
-1. Install OpenVPN (apt-get install openvpn)
-2. Copy all Config files into /etc/openvpn directory
-3. Open login_playhide.txt & set your nickname in the 1. & 2. line & close/save the Txt.
-4. chmod 777 /etc/openvpn/playhide_connect.sh && chmod 777 /etc/openvpn/dhcp.sh
-5. bash /etc/openvpn/playhide_connect.sh
-6. Have Fun
+1. chmod 777 ./playhide_connect.sh
+2. ./playhide_connect.sh setup
+3. ./playhide_connect.sh start
+3. Have Fun
 
-Run ifconfig -a to see all network interfaces, if tap interface is show with IP 10.5.1.x all seems to work. 
 
-Info!: Client could take up to 30-40 to assign the IP & connect correctly to PlayHide Network. 
+Use ./playhide_connect.sh stop
+Stopped PlayHide
+
+Use ./playhide_connect.sh status
+Shows the IP
