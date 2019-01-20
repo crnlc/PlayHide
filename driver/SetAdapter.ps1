@@ -1,8 +1,13 @@
-$adapter = gwmi win32_networkadapterconfiguration | ? { $_.IPaddress -like "*10.5*"}
+param(
+[string]$Name,
+[string]$Subnet)
+
+$adapter = gwmi win32_networkadapterconfiguration | ? { $_.IPaddress -like $Subnet}
 $i = 1
+
 foreach($element in $adapter){
 $adapterindex = $element.index
-$newname = "PlayHide VPN"
+$newname = $Name
 $adapterID = gwmi win32_networkadapter | ?{$_.index -eq $adapterindex}
 $adapter = ($adapterID).NetConnectionID
     $input = @"

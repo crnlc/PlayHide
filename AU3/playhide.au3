@@ -237,7 +237,7 @@ else
 			Sleep(15000)
 			If ProcessExists("openvpn.exe") And Ping($ServerSubnet & "1") Then
 			Sleep(100)
-			RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1"', "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1" -Subnet ' & $ServerSubnet & '* -Name ' & '"' & $AppName & '"', "", @SW_HIDE)
 			RunWait('netsh interface ipv4 set interface "' &  $AppName & '" metric=1')
 			ProcessClose("openvpn.exe")
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_success, $String_setup_success_msg)
