@@ -44,7 +44,8 @@ Global $ServerEndRange = IniRead($SettingsFile, "Server", "EndRange", "")
 Global $ServerCA = IniRead($SettingsFile, "Server", "Cert", "")
 Global $AdapterName = IniRead($SettingsFile, "Server", "AdapterName", "")
 Global $Params = "--mode server --tls-server --resolv-retry infinite --keepalive 10 60 --reneg-sec 432000 --persist-key --persist-tun --client-cert-not-required --cipher AES-128-CBC --client-to-client --username-as-common-name --compress lz4-v2 --duplicate-cn --remote-cert-tls server --verb 0 --mute-replay-warnings --ca .\certs\server\ca.crt --cert .\certs\server\server.crt --key .\certs\server\server.key --dh .\certs\server\dh2048.pem --script-security 3 --auth-user-pass-verify .\config\auth.bat via-env"
-Global $Connect = @ComSpec & " /c " & 'bin32\' & $OpenVPNExe & ' ' & $Params & ' --server-bridge ' & $ServerIP & ' 255.255.255.0 ' & $ServerSubnet & $ServerStartRange & ' ' & $ServerSubnet & $ServerEndRange & ' --port ' & $ServerPort & ' --proto ' & $ServerProto & ' --dev ' & $ServerDev & ' --config .\config\server.ovpn' & ' --dev-node "' & $AdapterName & '"' & ' --ifconfig ' & $ServerIP & ' ' & $ServerSubnetMask
+Global $ConnectSetup = @ComSpec & " /c " & 'bin32\' & $OpenVPNExe & ' ' & $Params & ' --server-bridge ' & $ServerIP & ' 255.255.255.0 ' & $ServerSubnet & $ServerStartRange & ' ' & $ServerSubnet & $ServerEndRange & ' --port ' & $ServerPort & ' --proto ' & $ServerProto & ' --dev ' & $ServerDev & ' --config .\config\server.ovpn' & ' --ifconfig ' & $ServerIP & ' ' & $ServerSubnetMask
+Global $Connect = $ConnectSetup & ' --dev-node "' & $AdapterName & '"'
 
 ### Language Strings
 Global $String_ok = IniRead($LanguageFile, "Strings", "ok", "")
@@ -56,6 +57,7 @@ Global $String_password = IniRead($LanguageFile, "Strings", "password", "")
 Global $String_website = IniRead($LanguageFile, "Strings", "website", "")
 Global $String_error = IniRead($LanguageFile, "Strings", "error", "")
 Global $String_error_msg = IniRead($LanguageFile, "Strings", "error_msg", "")
+Global $String_setup = IniRead($LanguageFile, "Strings", "setup", "")
 Global $String_setup_info = IniRead($LanguageFile, "Strings", "setup_info", "")
 Global $String_setup_msg = IniRead($LanguageFile, "Strings", "setup_msg", "")
 Global $String_setup_msg2 = IniRead($LanguageFile, "Strings", "setup_msg2", "")
@@ -265,7 +267,7 @@ While 1
             ShellExecute("http://playhide.tk")
 
 		 Case $ButtonConnect
-		 Run($Connect, "", @SW_HIDE)
+		 Run($ConnectSetup, "", @SW_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
 		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
 		 sleep(500)
@@ -290,17 +292,29 @@ EndIf
 				  TrayItemSetText($iStatus, $String_not_connected)
 
 		Case $GUI_MENU_BUTTON
-		 Local $MenuButtonsArray[5] = [$String_language, $String_network, $String_close]
+		 Local $MenuButtonsArray[5] = [$String_language, $String_network, $String_setup, $String_close]
 			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
 			Switch $MenuSelect
 			   Case "0"
 					 LanguageList()
 				  Case "1"
 			   run(".\bin32\network-scan.exe")
-				Case "2"
+				Case "3"
 					 ProcessClose($OpenVPNExe)
 					_Metro_GUIDelete($Form1)
 					Exit
+				 Case "2"
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="' & $AppName & '" dir=in action=allow protocol=' & $ServerProto & ' localport=' & $ServerPort , "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
+			RunWait('driver\tap.exe')
+			Run($ConnectSetup, "", @SW_HIDE)
+			Sleep(8000)
+			RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1" -Subnet ' & $ServerSubnet & '* -Name ' & '"' & $AdapterName & '"', "", @SW_HIDE)
+			RunWait('netsh interface ipv4 set interface "' &  $AdapterName & '" metric=1')
+			ProcessClose($OpenVPNExe)
+			_Metro_MsgBox($MB_SYSTEMMODAL, $String_setup_success, $String_setup_success_msg)
+			_GUIDisable($Form1)
+			RestartScript()
 			EndSwitch
 
 			 		  EndSwitch
