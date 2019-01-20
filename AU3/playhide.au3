@@ -233,7 +233,7 @@ else
 			$Setup = _Metro_MsgBox(0, $String_setup_info, $String_setup_msg)
 			RunWait('driver\tap.exe')
 			Run($Connect, "", @SW_HIDE)
-						_Metro_MsgBox(0, $String_info, "Now we testing the Network and configure some more!")
+						_Metro_MsgBox(0, $String_info, $String_setup_msg2)
 			Sleep(15000)
 			If ProcessExists("openvpn.exe") And Ping($ServerSubnet & "1") Then
 			Sleep(100)
