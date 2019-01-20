@@ -37,7 +37,8 @@ Global $ServerConfig = IniRead($ServerList, $ServerSaved, "Config", "")
 Global $ServerLogin = IniRead($ServerList, $ServerSaved, "Login", "")
 Global $LoginFile =  ".\config\" & $ServerLogin
 Global $Params = "--client --nobind --resolv-retry infinite --persist-key --persist-tun --auth-nocache --remote-cert-tls server --verb 0 --mute-replay-warnings"
-Global $Connect = @ComSpec & " /c " & 'bin32\openvpn.exe ' & $Params & ' --remote ' & $ServerIP & ' ' & $ServerPort & ' --ca .\certs\' & $ServerCA & ' --dev ' & $ServerDev & ' --proto ' & $ServerProto & ' --config .\config\' & $ServerConfig & ' --auth-user-pass ' & $LoginFile
+Global $ConnectSetup = @ComSpec & " /c " & 'bin32\openvpn.exe ' & $Params & ' --remote ' & $ServerIP & ' ' & $ServerPort & ' --ca .\certs\' & $ServerCA & ' --dev ' & $ServerDev & ' --proto ' & $ServerProto & ' --config .\config\' & $ServerConfig & ' --auth-user-pass ' & $LoginFile
+Global $Connect = $ConnectSetup & ' --dev-node "' & $AppName & '"'
 Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 Global $AuthSetting = IniRead($SettingsFile, "Settings", "Auth", "")
 
@@ -232,7 +233,7 @@ else
 			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
 			$Setup = _Metro_MsgBox(0, $String_setup_info, $String_setup_msg)
 			RunWait('driver\tap.exe')
-			Run($Connect, "", @SW_HIDE)
+			Run($ConnectSetup, "", @SW_HIDE)
 						_Metro_MsgBox(0, $String_info, $String_setup_msg2)
 			Sleep(15000)
 			If ProcessExists("openvpn.exe") And Ping($ServerSubnet & "1") Then
@@ -264,7 +265,7 @@ EndIf
 If ProcessExists("openvpn.exe") Then
        _Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_start_msg3)
    Exit
-else
+EndIf
 Local $hTimer = TimerInit()
 $Form1 = _Metro_CreateGUI($AppName, 250, 200, -1, -1, true,false)
 $Control_Buttons = _Metro_AddControlButtons(False,False,True,False,True)
@@ -356,7 +357,6 @@ EndIf
    else
 	  				GUISetState(@SW_SHOW)
 
-   EndIf
    EndIf
 EndIf
 EndIf
