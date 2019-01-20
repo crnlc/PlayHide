@@ -41,6 +41,13 @@ _Tested with Call of Duty WWII & other Games under Windows 7 / 10 / 8.1_
 2. Setup will start / Tap Driver installer (*needed)
 3. Click Connect to join into the VPN Network
 
+### Server
+1. Setup in driver dir a 2nd TAP Adapter by execute the Add Server Tap.cmd
+2. Rename in Windows the new Adapter to PlayHide Server
+3. Forward Port 1400 as UDP or Configure your own in the Settings.ini
+4. Start PlayHide Server
+5. Configure the Client in server.ini with your Domain/DynDNS/IP
+
 ## Issues / Troubleshooting?
 - Make sure your 3rd party Firewall get access to Port 1400 as UDP (only Windows Firewall tested)
 - The Metric musst be 1 on the Tap Interface normal by Install Script will set it.
