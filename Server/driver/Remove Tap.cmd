@@ -1,0 +1,1 @@
+tapinstall.exe remove ROOT\NET\0004
