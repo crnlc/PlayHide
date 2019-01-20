@@ -228,7 +228,7 @@ else
 			FileWrite($file, _RandomText(10))
 			FileClose($file)
 			Endif
-			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="PlayHide VPN" dir=in action=allow protocol=' & $ServerProto & ' localport=' & $ServerPort , "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="' & $AppName & '" dir=in action=allow protocol=' & $ServerProto & ' localport=' & $ServerPort , "", @SW_HIDE)
 			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
 			$Setup = _Metro_MsgBox(0, $String_setup_info, $String_setup_msg)
 			RunWait('driver\tap.exe')
@@ -238,7 +238,7 @@ else
 			If ProcessExists("openvpn.exe") And Ping($ServerSubnet & "1") Then
 			Sleep(100)
 			RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1"', "", @SW_HIDE)
-			RunWait('netsh interface ipv4 set interface "PlayHide VPN" metric=1')
+			RunWait('netsh interface ipv4 set interface "' &  $AppName & '" metric=1')
 			ProcessClose("openvpn.exe")
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_success, $String_setup_success_msg)
 			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
@@ -503,7 +503,7 @@ EndIf
 
 		 Case $iDesktopIcon
 			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
-			FileCreateShortcut(@AutoItExe, @DesktopDir & "\PlayHide VPN.lnk", @ScriptDir)
+			FileCreateShortcut(@AutoItExe, @DesktopDir & "\" & $AppName & ".lnk", @ScriptDir)
 			_GUIDisable($Form1, 0, 30)
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_shortcut_info)
 			_GUIDisable($Form1)
@@ -515,12 +515,12 @@ EndIf
 
 					 Case $iAutostart
 			if Not FileExists(@StartupDir & "\" & $AppName & ".lnk") Then
-			FileCreateShortcut(@AutoItExe, @StartupDir & "\PlayHide.lnk", @ScriptDir)
+			FileCreateShortcut(@AutoItExe, @StartupDir & "\" & $AppName & ".lnk", @ScriptDir)
 			_GUIDisable($Form1, 0, 30)
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_autostart_info)
 			_GUIDisable($Form1)
 		 else
-			FileDelete(@StartupDir & "\PlayHide.lnk")
+			FileDelete(@StartupDir & "\" &  $AppName & ".lnk")
 			_GUIDisable($Form1, 0, 30)
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_autostart_info2)
 			_GUIDisable($Form1)
