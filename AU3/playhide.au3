@@ -43,6 +43,8 @@ Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 Global $AuthSetting = IniRead($SettingsFile, "Settings", "Auth", "")
 
 ### Language Strings
+Global $String_no = IniRead($LanguageFile, "Strings", "no", "")
+Global $String_yes = IniRead($LanguageFile, "Strings", "yes", "")
 Global $String_ok = IniRead($LanguageFile, "Strings", "ok", "")
 Global $String_done = IniRead($LanguageFile, "Strings", "done", "")
 Global $String_success = IniRead($LanguageFile, "Strings", "success", "")
@@ -55,6 +57,7 @@ Global $String_error_msg = IniRead($LanguageFile, "Strings", "error_msg", "")
 Global $String_setup_info = IniRead($LanguageFile, "Strings", "setup_info", "")
 Global $String_setup_msg = IniRead($LanguageFile, "Strings", "setup_msg", "")
 Global $String_setup_msg2 = IniRead($LanguageFile, "Strings", "setup_msg2", "")
+Global $String_setup_msg3 = IniRead($LanguageFile, "Strings", "setup_msg3", "")
 Global $String_setup_success = IniRead($LanguageFile, "Strings", "setup_success", "")
 Global $String_setup_success_msg = IniRead($LanguageFile, "Strings", "setup_success_msg", "")
 Global $String_setup_failed = IniRead($LanguageFile, "Strings", "setup_failed", "")
@@ -242,6 +245,20 @@ else
 			RunWait('netsh interface ipv4 set interface "' &  $AppName & '" metric=1')
 			ProcessClose("openvpn.exe")
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_success, $String_setup_success_msg)
+		         $msg = _Metro_MsgBox (4,$String_info,$String_setup_msg3)
+        If $msg = "NO" Then
+		ElseIf $msg = "YES" Then
+RunWait(@ComSpec & " /c " & 'net stop server /y', "", @SW_HIDE)
+RunWait(@ComSpec & " /c " & 'regedit.exe /S .\tools\Disable-SMB.reg', "", @SW_HIDE)
+RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=445 name="Block_TCP-445"', "", @SW_HIDE)
+RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=137 name="Block_TCP-137"', "", @SW_HIDE)
+RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=138 name="Block_TCP-138"', "", @SW_HIDE)
+RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=139 name="Block_TCP-139"', "", @SW_HIDE)
+RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=445 name="Block_TCP-445"', "", @SW_HIDE)
+RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=137 name="Block_TCP-137"', "", @SW_HIDE)
+RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=138 name="Block_TCP-138"', "", @SW_HIDE)
+RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=139 name="Block_TCP-139"', "", @SW_HIDE)
+			 EndIf
 			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
 			FileCreateShortcut(@AutoItExe, @DesktopDir & "\" & $AppName & ".lnk", @ScriptDir)
 		 else
