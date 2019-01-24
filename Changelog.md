@@ -125,3 +125,6 @@
 
 ### Version 4.3
 - Bugfixes
+
+### Version 4.4
+- Setup Feature added (Disable SMB Service (Computerbrowsing)
