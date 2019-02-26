@@ -12,7 +12,6 @@ DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
 #include <TrayConstants.au3>
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
-#include <WinAPIFiles.au3>
 #include <InetConstants.au3>
 #include <GuiButton.au3>
 #include <Misc.au3>
