@@ -1,13 +1,9 @@
-DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
-#AutoIt3Wrapper_Run_Au3Stripper=y
-#Au3Stripper_Parameters=/so /rm /pe
-#Au3Stripper_Ignore_Funcs=_iHoverOn,_iHoverOff,_iFullscreenToggleBtn,_cHvr_CSCP_X64,_cHvr_CSCP_X86,_iControlDelete
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_Res_HiDpi=y
-;~ Coded by Ian Maxwell (llewxam)
-;~ Based off threaded IP script by Manadar
-;~ http://www.autoitscript.com/forum/topic/104334-whats-wrong-with-ping-or-with-me/page__view__findpost__p__740697
-
-;~ Build date January 25 2014
+#AutoIt3Wrapper_Res_Comment=
+#AutoIt3Wrapper_Res_Description=
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
 #include "MetroGUI-UDF\MetroGUI_UDF.au3"
 #include "MetroGUI-UDF\_GUIDisable.au3"

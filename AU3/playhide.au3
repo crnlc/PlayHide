@@ -1,8 +1,9 @@
-DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
-#AutoIt3Wrapper_Run_Au3Stripper=y
-#Au3Stripper_Parameters=/so /rm /pe
-#Au3Stripper_Ignore_Funcs=_iHoverOn,_iHoverOff,_iFullscreenToggleBtn,_cHvr_CSCP_X64,_cHvr_CSCP_X86,_iControlDelete
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_Res_HiDpi=y
+#AutoIt3Wrapper_Res_Comment=
+#AutoIt3Wrapper_Res_Description=
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #include "MetroGUI-UDF\MetroGUI_UDF.au3"
 #include "MetroGUI-UDF\_GUIDisable.au3"
 #include <GUIConstants.au3>
@@ -149,7 +150,7 @@ Func _Metro_InputBox2($Promt, $Font_Size = 11, $DefaultText = "", $PW = False, $
  EndFunc   ;==>_Metro_InputBox
 
 Func _IPDetails()
-    Local $oWMIService = ObjGet('winmgmts:{impersonationLevel = impersonate}!\\' & '.' & '\root\cimv2')
+    Local $oWMIService = ObjGet('winmgmts:\\' & '.' & '\root\cimv2')
     Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where DHCPServer="' & $ServerDHCP & '"', 'WQL', 0x30), $aReturn[5] = [0]
     If IsObj($oColItems) Then
         For $oObjectItem In $oColItems
