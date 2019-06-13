@@ -94,7 +94,7 @@ Global $String_autoconnect_info = IniRead($LanguageFile, "Strings", "autoconnect
 Global $String_autoconnect_info2 = IniRead($LanguageFile, "Strings", "autoconnect_info2", "")
 Global $String_network = IniRead($LanguageFile, "Strings", "network", "")
 Global $String_scanner_msg = IniRead($LanguageFile, "Strings", "scanner_msg", "")
-
+Global $String_mac_copy = IniRead($LanguageFile, "Strings", "mac_copy", "")
 
 TraySetState(16)
 TraySetToolTip ($AppName)
@@ -172,6 +172,24 @@ Func RestartScript()
     Exit
  EndFunc
 
+Func GET_MAC($_MACsIP)
+    Local $_MAC,$_MACSize
+    Local $_MACi,$_MACs,$_MACr,$_MACiIP
+    $_MAC = DllStructCreate("byte[6]")
+    $_MACSize = DllStructCreate("int")
+    DllStructSetData($_MACSize,1,6)
+    $_MACr = DllCall ("Ws2_32.dll", "int", "inet_addr", "str", $_MACsIP)
+    $_MACiIP = $_MACr[0]
+    $_MACr = DllCall ("iphlpapi.dll", "int", "SendARP", "int", $_MACiIP, "int", 0, "ptr", DllStructGetPtr($_MAC), "ptr", DllStructGetPtr($_MACSize))
+    $_MACs  = ""
+    For $_MACi = 0 To 5
+    If $_MACi Then $_MACs = $_MACs & ":"
+        $_MACs = $_MACs & Hex(DllStructGetData($_MAC,1,$_MACi+1),2)
+    Next
+    DllClose($_MAC)
+    DllClose($_MACSize)
+    Return $_MACs
+EndFunc
 $VersionsInfo = "http://playhide.tk/files/version.ini"
 $oldVersion = IniRead("updater.ini","Version","Version","NotFound")
 $newVersion = "0.0"
@@ -469,7 +487,12 @@ While 1
 			   GUISetState(@SW_HIDE, $Form1)
 			Case $link
             ShellExecute("http://playhide.tk")
-
+		 Case $LabelShowIP
+		 $MAC = GET_MAC($sData)
+		 _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, "MAC: " & $MAC)
+		 ClipPut($MAC)
+		 _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_mac_copy)
+		 _GUIDisable($Form1)
 		 Case $ButtonConnect
 		 Run($Connect, "", @SW_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
@@ -536,7 +559,7 @@ EndIf
 			_GUIDisable($Form1)
 		 EndIf
 
-					 Case $iAutostart
+		 Case $iAutostart
 			if Not FileExists(@StartupDir & "\" & $AppName & ".lnk") Then
 			FileCreateShortcut(@AutoItExe, @StartupDir & "\" & $AppName & ".lnk", @ScriptDir)
 			_GUIDisable($Form1, 0, 30)
