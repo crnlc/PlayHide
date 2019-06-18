@@ -128,3 +128,8 @@
 
 ### Version 4.4
 - Setup Feature added (Disable SMB Service (Computerbrowsing)
+
+### Version 4.5
+- Switch to new Domain & Named Server Location from France to Germany
+- Show & Copy Mac Address on IP Label
+- Updated Binaries

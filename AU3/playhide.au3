@@ -37,7 +37,7 @@ Global $ServerConfig = IniRead($ServerList, $ServerSaved, "Config", "")
 Global $ServerLogin = IniRead($ServerList, $ServerSaved, "Login", "")
 Global $LoginFile =  ".\config\" & $ServerLogin
 Global $Params = "--client --nobind --resolv-retry infinite --persist-key --persist-tun --auth-nocache --remote-cert-tls server --verb 0 --mute-replay-warnings"
-Global $ConnectSetup = @ComSpec & " /c " & 'bin32\openvpn.exe ' & $Params & ' --remote ' & $ServerIP & ' ' & $ServerPort & ' --ca .\certs\' & $ServerCA & ' --dev ' & $ServerDev & ' --proto ' & $ServerProto & ' --config .\config\' & $ServerConfig & ' --auth-user-pass ' & $LoginFile
+Global $ConnectSetup = @ComSpec & " /c " & 'bin\openvpn.exe ' & $Params & ' --remote ' & $ServerIP & ' ' & $ServerPort & ' --ca .\certs\' & $ServerCA & ' --dev ' & $ServerDev & ' --proto ' & $ServerProto & ' --config .\config\' & $ServerConfig & ' --auth-user-pass ' & $LoginFile
 Global $Connect = $ConnectSetup & ' --dev-node "' & $AppName & '"'
 Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 Global $AuthSetting = IniRead($SettingsFile, "Settings", "Auth", "")
@@ -190,7 +190,7 @@ Func GET_MAC($_MACsIP)
     DllClose($_MACSize)
     Return $_MACs
 EndFunc
-$VersionsInfo = "http://playhide.tk/files/version.ini"
+$VersionsInfo = "http://playhide.eu/files/version.ini"
 $oldVersion = IniRead("updater.ini","Version","Version","NotFound")
 $newVersion = "0.0"
 $Ini = InetGet($VersionsInfo,@ScriptDir & "\version.ini") ;download version.ini
@@ -486,7 +486,7 @@ While 1
 			   TraySetState(1)
 			   GUISetState(@SW_HIDE, $Form1)
 			Case $link
-            ShellExecute("http://playhide.tk")
+            ShellExecute("http://playhide.eu")
 		 Case $LabelShowIP
 		 $MAC = GET_MAC($sData)
 		 _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, "MAC: " & $MAC)
@@ -527,7 +527,7 @@ EndIf
 			   Case "1"
 					 LanguageList()
 				  Case "2"
-			   run(".\bin32\network-scan.exe")
+			   run(".\bin\network-scan.exe")
 				Case "3"
 					 ProcessClose("openvpn.exe")
 					_Metro_GUIDelete($Form1)
@@ -545,7 +545,7 @@ EndIf
 	  Case $iOpenChat
 
 		  Case $iWebsite
-			   ShellExecute("http://playhide.tk")
+			   ShellExecute("http://playhide.eu")
 
 		 Case $iDesktopIcon
 			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
