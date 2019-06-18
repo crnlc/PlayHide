@@ -17,6 +17,7 @@ DllCall("kernel32.dll", "int", "Wow64DisableWow64FsRedirection", "int", 1)
 #include <GuiButton.au3>
 #include <Misc.au3>
 #traymenu()
+#RequireAdmin
 _Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
 $AppName = "PlayHide VPN - Server"
@@ -42,9 +43,11 @@ Global $ServerSubnetMask = IniRead($SettingsFile, "Server", "SubnetMask", "")
 Global $ServerStartRange = IniRead($SettingsFile, "Server", "StartRange", "")
 Global $ServerEndRange = IniRead($SettingsFile, "Server", "EndRange", "")
 Global $ServerCA = IniRead($SettingsFile, "Server", "Cert", "")
+Global $ServerMaxClients = IniRead($SettingsFile, "Server", "MaxClients", "")
 Global $AdapterName = IniRead($SettingsFile, "Server", "AdapterName", "")
-Global $Params = "--mode server --tls-server --resolv-retry infinite --keepalive 10 60 --reneg-sec 432000 --persist-key --persist-tun --client-cert-not-required --cipher AES-128-CBC --client-to-client --username-as-common-name --compress lz4-v2 --duplicate-cn --remote-cert-tls server --verb 0 --mute-replay-warnings --ca .\certs\server\ca.crt --cert .\certs\server\server.crt --key .\certs\server\server.key --dh .\certs\server\dh2048.pem --script-security 3 --auth-user-pass-verify .\config\auth.bat via-env"
-Global $ConnectSetup = @ComSpec & " /c " & 'bin32\' & $OpenVPNExe & ' ' & $Params & ' --server-bridge ' & $ServerIP & ' 255.255.255.0 ' & $ServerSubnet & $ServerStartRange & ' ' & $ServerSubnet & $ServerEndRange & ' --port ' & $ServerPort & ' --proto ' & $ServerProto & ' --dev ' & $ServerDev & ' --config .\config\server.ovpn' & ' --ifconfig ' & $ServerIP & ' ' & $ServerSubnetMask
+Global $Params = "--mode server --tls-server --resolv-retry infinite --keepalive 10 60 --reneg-sec 432000 --persist-key --persist-tun --client-cert-not-required --cipher AES-128-CBC --client-to-client --username-as-common-name --compress lz4-v2 --duplicate-cn --remote-cert-tls server --verb 0 --mute-replay-warnings --ca .\certs\server\ca.crt --cert .\certs\server\server.crt --key .\certs\server\server.key --dh .\certs\server\dh2048.pem --script-security 3 --auth-user-pass-verify .\config\auth.bat via-env --client-config-dir .\config\clients"
+Global $RouteParams = '--route ' & $ServerSubnet & '0 ' & $ServerSubnetMask & ' --push "route ' & $ServerSubnet & '0 ' & $ServerSubnetMask & '"' & ' --push "route-metric 1"'
+Global $ConnectSetup = @ComSpec & " /c " & 'bin32\' & $OpenVPNExe & ' ' & $Params & ' ' & $RouteParams & ' --server-bridge ' & $ServerIP & ' 255.255.255.0 ' & $ServerSubnet & $ServerStartRange & ' ' & $ServerSubnet & $ServerEndRange & ' --port ' & $ServerPort & ' --proto ' & $ServerProto & ' --dev ' & $ServerDev & ' --config .\config\server.ovpn' & ' --ifconfig ' & $ServerIP & ' ' & $ServerSubnetMask & ' --max-clients ' & $ServerMaxClients
 Global $Connect = $ConnectSetup & ' --dev-node "' & $AdapterName & '"'
 
 ### Language Strings
@@ -264,7 +267,7 @@ While 1
 			   TraySetState(1)
 			   GUISetState(@SW_HIDE, $Form1)
 			Case $link
-            ShellExecute("http://playhide.tk")
+            ShellExecute("http://playhide.eu")
 
 		 Case $ButtonConnect
 		 Run($ConnectSetup, "", @SW_HIDE)
@@ -326,7 +329,7 @@ EndIf
 		 Exit
 
 		  Case $iWebsite
-			   ShellExecute("http://playhide.tk")
+			   ShellExecute("http://playhide.eu")
 
 		 Case $iDesktopIcon
 			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
