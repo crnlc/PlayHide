@@ -190,13 +190,8 @@ Func GET_MAC($_MACsIP)
     DllClose($_MACSize)
     Return $_MACs
 EndFunc
-Func _OSVersion($sHostName = @ComputerName)
-	Local $sOSVersion = RegRead('\\' & $sHostName & '\HKLM\Software\Microsoft\Windows NT\CurrentVersion', 'CurrentVersion')
-	If @error Then Return SetError(1, 0, 0)
-	Return Number($sOSVersion)
-EndFunc   ;==>_OSVersion
-If $CheckUpdateSetting >0 then
 
+If $CheckUpdateSetting >0 then
 	$VersionsInfo = "http://playhide.eu/files/version.ini"
 	$oldVersion = IniRead("updater.ini","Version","Version","NotFound")
 	$newVersion = "0.0"
@@ -263,8 +258,8 @@ else
 			$ReadResultDev = StdoutRead($DevResult)
 			$DevExist = StringInStr($ReadResultDev, $AppName)
 			if Not $DevExist then
-			$osv = _OSVersion
-			If $osv = "6.1" Then
+			$osv = @OSVersion
+			If $osv = "WIN_7" Then
 			RunWait('driver\tap.exe')
 			Else
 			RunWait('driver\tap-win10.exe')
