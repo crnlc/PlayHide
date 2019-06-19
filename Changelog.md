@@ -133,3 +133,6 @@
 - Switch to new Domain & Named Server Location from France to Germany
 - Show & Copy Mac Address on IP Label
 - Updated Binaries
+
+### Version 4.6
+- Detect OS for correct TAP DriverSetup
