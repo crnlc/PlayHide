@@ -154,7 +154,7 @@ Func _IPDetails()
     Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where DHCPServer="' & $ServerDHCP & '"', 'WQL', 0x30), $aReturn[5] = [0]
     If IsObj($oColItems) Then
         For $oObjectItem In $oColItems
-            If $oObjectItem.IPAddress(0) == @IPAddress1 Then
+            If $oObjectItem.IPAddress(0) Then
                 $aReturn[0] = 4
                 $aReturn[1] = $oObjectItem.IPAddress(0)
             EndIf
@@ -192,7 +192,7 @@ Func GET_MAC($_MACsIP)
 EndFunc
 
 If $CheckUpdateSetting >0 then
-	$VersionsInfo = "http://playhide.eu/files/version.ini"
+	$VersionsInfo = "https://playhide.eu/files/version.ini"
 	$oldVersion = IniRead("updater.ini","Version","Version","NotFound")
 	$newVersion = "0.0"
 	$Ini = InetGet($VersionsInfo,@ScriptDir & "\version.ini") ;download version.ini

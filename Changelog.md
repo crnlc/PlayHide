@@ -101,7 +101,6 @@
 - Fixed sleep UI to dentermine IP
 - Single Instance Check
 
-
 ### Version 3.9
 - First Setup possible with other Server (Custom Server Support)
 - Determine IP by DHCP-Server (Custom Server Support) 
@@ -140,3 +139,6 @@
 ### Version 4.7
 - Fixed DHCP in servers.ini
 - Fixed moving window on top
+
+### Version 4.8
+- Fixed determine IP
