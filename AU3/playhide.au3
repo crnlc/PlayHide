@@ -315,11 +315,10 @@ EndIf
 Local $hTimer = TimerInit()
 $Form1 = _Metro_CreateGUI($AppName, 250, 200, -1, -1, true,false)
 $Control_Buttons = _Metro_AddControlButtons(False,False,True,False,True)
-#$GUI_CLOSE_BUTTON = $Control_Buttons[0]
 $GUI_MINIMIZE_BUTTON = $Control_Buttons[3]
 $GUI_MENU_BUTTON = $Control_Buttons[6]
 GUISetIcon($sFile)
-GUICtrlCreateLabel($AppName, 50, 7, 300, 30)
+GUICtrlCreateLabel($AppName, 50, 7, 80, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)

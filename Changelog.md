@@ -136,3 +136,7 @@
 
 ### Version 4.6
 - Detect OS for correct TAP DriverSetup
+
+### Version 4.7
+- Fixed DHCP in servers.ini
+- Fixed moving window on top
