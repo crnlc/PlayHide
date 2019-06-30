@@ -23,6 +23,7 @@ $AppName = "PlayHide VPN"
 Global $SettingsFile = @ScriptDir & "\Settings.ini"
 Global $Language = IniRead($SettingsFile, "Settings", "Language", "")
 Global $CheckUpdateSetting = IniRead($SettingsFile, "Settings", "CheckUpdate", "")
+Global $LogSetting = IniRead($SettingsFile, "Settings", "Log", "")
 Global $LanguageFile = @ScriptDir & "\lang\" & $Language & ".ini"
 Global $ServerList = @ScriptDir & "\config\servers.ini"
 Global $ServerSaved = IniRead($SettingsFile, "Settings", "Server", "")
@@ -36,7 +37,13 @@ Global $ServerCA = IniRead($ServerList, $ServerSaved, "Cert", "")
 Global $ServerConfig = IniRead($ServerList, $ServerSaved, "Config", "")
 Global $ServerLogin = IniRead($ServerList, $ServerSaved, "Login", "")
 Global $LoginFile =  ".\config\" & $ServerLogin
-Global $Params = "--client --nobind --resolv-retry infinite --persist-key --persist-tun --auth-nocache --remote-cert-tls server --verb 0 --mute-replay-warnings"
+If $LogSetting >0 then
+DirCreate(".\logs")
+Global $ParamsLog = "--verb " & $LogSetting & " --log-append .\logs\openvpn.log"
+else
+Global $ParamsLog = ""
+EndIf
+Global $Params = "--client --nobind --resolv-retry infinite --persist-key --persist-tun --auth-nocache --remote-cert-tls server --mute-replay-warnings " & $ParamsLog
 Global $ConnectSetup = @ComSpec & " /c " & 'bin\openvpn.exe ' & $Params & ' --remote ' & $ServerIP & ' ' & $ServerPort & ' --ca .\certs\' & $ServerCA & ' --dev ' & $ServerDev & ' --proto ' & $ServerProto & ' --config .\config\' & $ServerConfig & ' --auth-user-pass ' & $LoginFile
 Global $Connect = $ConnectSetup & ' --dev-node "' & $AppName & '"'
 Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
