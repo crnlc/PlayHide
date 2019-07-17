@@ -250,7 +250,7 @@ If Not FileExists($LoginFile) then
 			FileWrite($file, $Username & @CRLF)
 			FileWrite($file, $Passwort)
 			FileClose($file)
-else
+			else
    			Local $file = FileOpen($LoginFile, 2)
 			FileFlush($file)
 			FileWrite($file, _RandomText(10) & @CRLF)
@@ -497,13 +497,17 @@ While 1
 			   TraySetState(1)
 			   GUISetState(@SW_HIDE, $Form1)
 			Case $link
-            ShellExecute("http://playhide.eu")
+			ShellExecute("https://playhide.eu")
+
 		 Case $LabelShowIP
-		 $MAC = GET_MAC($sData)
+			$aArray = _IPDetails()
+			If $aArray[1] Then
+		$MAC = GET_MAC($sData)
 		 _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, "MAC: " & $MAC)
 		 ClipPut($MAC)
 		 _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_mac_copy)
 		 _GUIDisable($Form1)
+		 EndIf
 		 Case $ButtonConnect
 		 Run($Connect, "", @SW_HIDE)
 		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
@@ -530,16 +534,18 @@ EndIf
 				  TrayItemSetText($iStatus, $String_not_connected)
 
 		Case $GUI_MENU_BUTTON
-		 Local $MenuButtonsArray[5] = ["Servers", $String_language, $String_network, $String_close]
+		 Local $MenuButtonsArray[5] = ["Servers", $String_language, $String_network, "Chat", $String_close]
 			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
 			Switch $MenuSelect
-			   Case "0"
+			    Case "0"
 					 ServerList()
-			   Case "1"
+			    Case "1"
 					 LanguageList()
-				  Case "2"
-			   run(".\bin\network-scan.exe")
-				Case "3"
+				Case "2"
+			   	run(".\bin\network-scan.exe")
+			   	Case "3"
+				ShellExecute("http://chat.vpn")
+				Case "4"
 					 ProcessClose("openvpn.exe")
 					_Metro_GUIDelete($Form1)
 					Exit
@@ -549,14 +555,17 @@ EndIf
 
         Switch TrayGetMsg()
             Case $idExit
-			   		 ProcessClose("openvpn.exe")
+			ProcessClose("openvpn.exe")
 		 _Metro_GUIDelete($Form1)
 		 Exit
 
 	  Case $iOpenChat
+		If $ChatSetting >0 then
+		ShellExecute("http://chat.vpn")
+		EndIf
 
 		  Case $iWebsite
-			   ShellExecute("http://playhide.eu")
+			   ShellExecute("https://playhide.eu")
 
 		 Case $iDesktopIcon
 			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
@@ -595,6 +604,7 @@ EndIf
 				_GUIDisable($Form1)
 			 EndIf
 			 Case $iLogin
+			If $AuthSetting >0 then
 			$ReadUsername = FileReadLine($LoginFile,1)
 			$ReadPasswort = FileReadLine($LoginFile,2)
 			$Username = _Metro_InputBox2($String_username, 15, $ReadUsername, False, False)
@@ -606,20 +616,12 @@ EndIf
 			FileWrite($file, $Passwort)
 			FileClose($file)
 			ProcessClose("openvpn.exe")
-			sleep(500)
-			Run($Connect, "", @SW_HIDE)
-						sleep(3000)
-									if Not ProcessExists("openvpn.exe") Then
-			   _GUIDisable($Form1, 0, 30)
-			   _Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_login_wrong)
-			   _GUIDisable($Form1)
-			EndIf
-			ProcessClose("openvpn.exe")
 			GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
 			GUICtrlSetState($ButtonConnect, $GUI_HIDE)
 			GUICtrlSetState($ButtonConnect, $GUI_SHOW)
 			GUICtrlSetData($LabelShowIP,$String_not_connected)
 			TrayItemSetText($iStatus, $String_not_connected)
+			EndIf
    Case $iOpen
 ConsoleWrite("up" & @CRLF)
 $ok = GUISetState(@SW_SHOW)
