@@ -142,3 +142,11 @@
 
 ### Version 4.8
 - Fixed determine IP
+
+### Version 4.9
+- Bugfixes
+- More Servers
+
+### Version 5.0
+- Web based Chat added
+- Bugfixes
