@@ -1,10 +1,7 @@
-#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Compression=4
+#AutoIt3Wrapper_Run_Au3Stripper=y
+#Au3Stripper_Parameters=/so /rm /pe
+#Au3Stripper_Ignore_Funcs=_iHoverOn,_iHoverOff,_iFullscreenToggleBtn,_cHvr_CSCP_X64,_cHvr_CSCP_X86,_iControlDelete
 #AutoIt3Wrapper_Res_HiDpi=y
-#AutoIt3Wrapper_Res_Comment=
-#AutoIt3Wrapper_Res_Description=
-#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
-
 #include "MetroGUI-UDF\MetroGUI_UDF.au3"
 #include "MetroGUI-UDF\_GUIDisable.au3"
 #include <iNet.au3>
@@ -25,7 +22,7 @@ Local $sFile = "icon.ico"
 _SetTheme("DarkPlayHide")
 #_SetTheme("DarkTealV2")
 
-$Appname = "PlayHide VPN - Network Scan"
+$Appname = "PlayHide VPN - Network"
 if _Singleton($Appname, 1) = 0 Then
 	       _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "Scanner already run!")
     Exit
@@ -77,11 +74,11 @@ EndIf
 $GUI = _Metro_CreateGUI("Network Scan", 340, 360, -1, -1, true,false)
 $Control_Buttons = _Metro_AddControlButtons(True,False,False,False,False)
 $GUI_CLOSE_BUTTON = $Control_Buttons[0]
-GUICtrlCreateLabel($AppName, 10, 7, 300, 30)
+GUICtrlCreateLabel($AppName, 10, 7, 180, 30)
 GUICtrlSetFont(-1, 11, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-$Rescan = _Metro_CreateButtonEx2("Rescan", 240, 40, 90, 30, $ButtonBKColor)
+$Rescan = _Metro_CreateButtonEx2("Refresh", 240, 40, 90, 30, $ButtonBKColor)
 $CopyToClip = _Metro_CreateButtonEx2("Copy IP", 10, 40, 100, 30, $ButtonBKColor)
 $Used = _GUICtrlListView_Create($GUI, "IP Address|Hostname|Ping", 10, 85, 320, 250)
 #_GUICtrlListView_SetBkColor($Used, 0x191919)
@@ -283,12 +280,6 @@ Func _HostName($CurIP)
 	GUICtrlSetData($CurrentlyScanning, $CurrentIP)
 	$DevName = _TCPIpToName($CurIP)
 	If @error Then $DevName = "Unknown"
-	if $CurIP==$ChosenIP Then
-		$DevName&=" (** this PC)"
-	endif
-	if $CurIP==$Gateway Then
-		$DevName&=" (** gateway)"
-	endif
 	Return $DevName
 EndFunc   ;==>_HostName
 
