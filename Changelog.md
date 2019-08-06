@@ -150,3 +150,6 @@
 ### Version 5.0
 - Web based Chat added
 - Bugfixes
+
+### Version 5.1
+- new Updater process
