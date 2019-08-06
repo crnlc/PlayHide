@@ -20,6 +20,9 @@
 _Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
 $AppName = "PlayHide VPN"
+$UpdaterVersionFile = ".\version.ini"
+Global $ReadVersion = IniRead($UpdaterVersionFile, "Version", "Version", "")
+
 Global $SettingsFile = @ScriptDir & "\Settings.ini"
 Global $Language = IniRead($SettingsFile, "Settings", "Language", "")
 Global $CheckUpdateSetting = IniRead($SettingsFile, "Settings", "CheckUpdate", "")
@@ -199,44 +202,25 @@ Func GET_MAC($_MACsIP)
 EndFunc
 
 If $CheckUpdateSetting >0 then
-	$VersionsInfo = "https://playhide.eu/files/version.ini"
-	$oldVersion = IniRead("updater.ini","Version","Version","NotFound")
+	$tmp = ".\tmp"
+	$urlVersion = "http://files.playhide.eu/version.ini"
 	$newVersion = "0.0"
-	$Ini = InetGet($VersionsInfo,@ScriptDir & "\version.ini") ;download version.ini
+	If Not FileExists($tmp) Then 
+		DirCreate($tmp)
+	EndIf
+	$Ini = InetGet($urlVersion,$tmp & "\version.ini", $INET_FORCERELOAD)
+	If $Ini = 0 Then 
+	Else
+		$newVersion = IniRead ($tmp & "\version.ini","Version","Version","")
+		If $NewVersion = $ReadVersion Then
+		Else
+		Run(".\update.exe")
+		exit
+	EndIf
+EndIf
+FileDelete($tmp & "\version.ini")
+EndIf	
 
-If $Ini = 0 Then ;was the download of version.ini successful?
-Else
-    $newVersion = IniRead (@ScriptDir & "\version.ini","Version","Version","") ;reads the new version out of version.ini
-    If $NewVersion = $oldVersion Then ;compare old and new
-    Else
-        $msg = _Metro_MsgBox (4,"Update","There is a new version existing: " & $newVersion & " ! You are using: " & $oldVersion & ". Do you want to download the new version?")
-        If $msg = "NO" Then ;No was pressed
-            FileDelete(@ScriptDir & "\version.ini")
-        ElseIf $msg = "YES" Then ;OK was pressed
-            $downloadLink = IniRead(@ScriptDir & "\version.ini","Version","7z","NotFound")
-            $dlhandle = InetGet($downloadLink,@ScriptDir & "\PlayHide.7z",1,1)
-            _Metro_CreateProgress(100, 195, 300, 26)
-            $Size = InetGetSize($downloadLink,1) ;get the size of the update
-            While Not InetGetInfo($dlhandle, 2)
-                $Percent = (InetGetInfo($dlhandle,0)/$Size)*100
-                ProgressSet( $Percent, $Percent & " percent");update progressbar
-                Sleep(1)
-            WEnd
-            ProgressSet(100 , $String_done, $String_complete);show complete progressbar
-            sleep(500)
-            ProgressOff() ;close progress window
-            IniWrite("updater.ini","version","version",$NewVersion) ;updates update.ini with the new version
-            InetClose($dlhandle)
-            EndIf
-    EndIf
- EndIf
-    EndIf
-
-FileDelete(@ScriptDir & "\version.ini")
-If FileExists("PlayHide.7z") then
-			Run(@ComSpec & " /c " & "update.exe" , "", @SW_HIDE)
-   exit
-else
 If Not FileExists($LoginFile) then
    If Not IsAdmin() Then
 			_Metro_MsgBox(0, $String_error, $String_start_msg)
@@ -344,8 +328,6 @@ $ShowServerLabel = GUICtrlCreateLabel("Server: " & $ServerSaved, 150, 170, 300, 
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
 GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-$UpdaterVersionFile = @ScriptDir & "\updater.ini"
-$ReadVersion = IniRead($UpdaterVersionFile, "Version", "Version", "")
 $link = GUICtrlCreateLabel("Vers: " & $ReadVersion & " / " & $String_website, 10, 170, 300, 30)
 GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
 GUICtrlSetColor(-1, 0xFFFFFF)
@@ -410,7 +392,6 @@ EndIf
 	  				GUISetState(@SW_SHOW)
 
    EndIf
-EndIf
 EndIf
 
 Func _RandomText($length)
