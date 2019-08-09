@@ -4,8 +4,8 @@
 #AutoIt3Wrapper_Res_Comment=
 #AutoIt3Wrapper_Res_Description=
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
-#include "MetroGUI-UDF\MetroGUI_UDF.au3"
-#include "MetroGUI-UDF\_GUIDisable.au3"
+#include <MetroGUI-UDF\MetroGUI_UDF.au3>
+#include <MetroGUI-UDF\_GUIDisable.au3>
 #include <GUIConstants.au3>
 #include <String.au3>
 #include <Array.au3>
@@ -16,6 +16,7 @@
 #include <InetConstants.au3>
 #include <GuiButton.au3>
 #include <Misc.au3>
+#include <playhide\functions.au3>
 #traymenu()
 _Metro_EnableHighDPIScaling()
 Opt("TrayMenuMode",3)
@@ -113,134 +114,16 @@ TraySetIcon($sFile)
 _SetTheme("DarkPlayHide")
 #_SetTheme("DarkTealV2")
 
-Func _Metro_InputBox2($Promt, $Font_Size = 11, $DefaultText = "", $PW = False, $EnableEnterHotkey = True, $ParentGUI = "")
-	Local $Metro_Input, $Metro_Input_GUI
-	If $ParentGUI = "" Then
-		$Metro_Input_GUI = _Metro_CreateGUI($Promt, 460, 170, -1, -1, False)
-	Else
-		$Metro_Input_GUI = _Metro_CreateGUI(WinGetTitle($ParentGUI, "") & ".Input", 460, 170, -1, -1, False, $ParentGUI)
-	EndIf
-	_Metro_SetGUIOption($Metro_Input_GUI, True)
-	GUICtrlCreateLabel($Promt, 3 * $gDPI, 3 * $gDPI, 454 * $gDPI, 60 * $gDPI, BitOR(0x1, 0x0200), 0x00100000)
-	GUICtrlSetFont(-1, $Font_Size, 400, 0, "Segoe UI")
-	GUICtrlSetColor(-1, $FontThemeColor)
-	If $PW Then
-		$Metro_Input = GUICtrlCreateInput($DefaultText, 16 * $gDPI, 75 * $gDPI, 429 * $gDPI, 28 * $gDPI, 32)
-	Else
-		$Metro_Input = GUICtrlCreateInput($DefaultText, 16 * $gDPI, 75 * $gDPI, 429 * $gDPI, 28 * $gDPI)
-	EndIf
-	GUICtrlSetFont(-1, 11, 500, 0, "Segoe UI")
 
-	GUICtrlSetState($Metro_Input, 256)
-	Local $cEnter = GUICtrlCreateDummy()
-	Local $aAccelKeys[1][2] = [["{ENTER}", $cEnter]]
-	Local $Button_Continue = _Metro_CreateButtonEx2("OK", 170, 120, 100, 36, $ButtonBKColor, $ButtonTextColor, "Segoe UI")
-	GUICtrlSetState($Button_Continue, 512)
+#include <playhide\checkupdate.au3>
 
-	GUISetState(@SW_SHOW)
-
-	If $EnableEnterHotkey Then
-		GUISetAccelerators($aAccelKeys, $Metro_Input_GUI)
-	EndIf
-
-	If $mOnEventMode Then Opt("GUIOnEventMode", 0) ;Temporarily deactivate oneventmode
-
-	While 1
-		$input_nMsg = GUIGetMsg()
-		Switch $input_nMsg
-			Case $Button_Continue, $cEnter
-				Local $User_Input = GUICtrlRead($Metro_Input)
-				If Not ($User_Input = "") Then
-					_Metro_GUIDelete($Metro_Input_GUI)
-					If $mOnEventMode Then Opt("GUIOnEventMode", 1) ;Reactivate oneventmode
-					Return $User_Input
-				EndIf
-		EndSwitch
-	WEnd
- EndFunc   ;==>_Metro_InputBox
-
-Func _IPDetails()
-    Local $oWMIService = ObjGet('winmgmts:\\' & '.' & '\root\cimv2')
-    Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where DHCPServer="' & $ServerDHCP & '"', 'WQL', 0x30), $aReturn[5] = [0]
-    If IsObj($oColItems) Then
-        For $oObjectItem In $oColItems
-            If $oObjectItem.IPAddress(0) Then
-                $aReturn[0] = 4
-                $aReturn[1] = $oObjectItem.IPAddress(0)
-            EndIf
-        Next
-    EndIf
-    Return SetError($aReturn[0] = 0, 0, $aReturn)
- EndFunc
-
-Func RestartScript()
-    If @Compiled = 1 Then
-        Run( FileGetShortName(@ScriptFullPath))
-    Else
-        Run( FileGetShortName(@AutoItExe) & " " & FileGetShortName(@ScriptFullPath))
-    EndIf
-    Exit
- EndFunc
-
-Func GET_MAC($_MACsIP)
-    Local $_MAC,$_MACSize
-    Local $_MACi,$_MACs,$_MACr,$_MACiIP
-    $_MAC = DllStructCreate("byte[6]")
-    $_MACSize = DllStructCreate("int")
-    DllStructSetData($_MACSize,1,6)
-    $_MACr = DllCall ("Ws2_32.dll", "int", "inet_addr", "str", $_MACsIP)
-    $_MACiIP = $_MACr[0]
-    $_MACr = DllCall ("iphlpapi.dll", "int", "SendARP", "int", $_MACiIP, "int", 0, "ptr", DllStructGetPtr($_MAC), "ptr", DllStructGetPtr($_MACSize))
-    $_MACs  = ""
-    For $_MACi = 0 To 5
-    If $_MACi Then $_MACs = $_MACs & ":"
-        $_MACs = $_MACs & Hex(DllStructGetData($_MAC,1,$_MACi+1),2)
-    Next
-    DllClose($_MAC)
-    DllClose($_MACSize)
-    Return $_MACs
-EndFunc
-
-If $CheckUpdateSetting >0 then
-	$tmp = ".\tmp"
-	$urlVersion = "http://files.playhide.eu/version.ini"
-	$newVersion = "0.0"
-	If Not FileExists($tmp) Then 
-		DirCreate($tmp)
-	EndIf
-	$Ini = InetGet($urlVersion,$tmp & "\version.ini", $INET_FORCERELOAD)
-	If $Ini = 0 Then 
-	Else
-		$newVersion = IniRead ($tmp & "\version.ini","Version","Version","")
-		If $NewVersion = $ReadVersion Then
-		Else
-		Run(".\update.exe")
-		exit
-	EndIf
-EndIf
-FileDelete($tmp & "\version.ini")
-EndIf	
 
 If Not FileExists($LoginFile) then
    If Not IsAdmin() Then
 			_Metro_MsgBox(0, $String_error, $String_start_msg)
 						Exit
 					 else
-			If $AuthSetting >0 then
-			$Username = _Metro_InputBox2($String_username, 15, "", False, False)
-			$Passwort = _Metro_InputBox2($String_password, 15, "", true, False)
-			$file = FileOpen($LoginFile, 2)
-			FileFlush($file)
-			FileWrite($file, $Username & @CRLF)
-			FileWrite($file, $Passwort)
-			FileClose($file)
-			else
-   			Local $file = FileOpen($LoginFile, 2)
-			FileFlush($file)
-			FileWrite($file, _RandomText(10) & @CRLF)
-			FileWrite($file, _RandomText(10))
-			FileClose($file)
-			Endif
+#include <playhide\auth.au3>
 			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="' & $AppName & '" dir=in action=allow protocol=' & $ServerProto & ' localport=' & $ServerPort , "", @SW_HIDE)
 			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
 			$Setup = _Metro_MsgBox(0, $String_setup_info, $String_setup_msg)
@@ -254,10 +137,10 @@ If Not FileExists($LoginFile) then
 			RunWait('driver\tap.exe')
 			Else
 			RunWait('driver\tap-win10.exe')
-			EndIf
-			EndIf
+		EndIf
+	EndIf
 			Run($ConnectSetup, "", @SW_HIDE)
-						_Metro_MsgBox(0, $String_info, $String_setup_msg2)
+			_Metro_MsgBox(0, $String_info, $String_setup_msg2)
 			Sleep(15000)
 			If ProcessExists("openvpn.exe") And Ping($ServerSubnet & "1") Then
 			Sleep(100)
@@ -265,363 +148,101 @@ If Not FileExists($LoginFile) then
 			RunWait('netsh interface ipv4 set interface "' &  $AppName & '" metric=1')
 			ProcessClose("openvpn.exe")
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_success, $String_setup_success_msg)
-		         $msg = _Metro_MsgBox (4,$String_info,$String_setup_msg3)
-        If $msg = "NO" Then
+		    $msg = _Metro_MsgBox (4,$String_info,$String_setup_msg3)
+    If $msg = "NO" Then
 		ElseIf $msg = "YES" Then
-RunWait(@ComSpec & " /c " & 'net stop server /y', "", @SW_HIDE)
-RunWait(@ComSpec & " /c " & 'regedit.exe /S .\tools\Disable-SMB.reg', "", @SW_HIDE)
-RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=445 name="Block_SMB-445"', "", @SW_HIDE)
-RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=137 name="Block_SMB-137"', "", @SW_HIDE)
-RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=138 name="Block_SMB-138"', "", @SW_HIDE)
-RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=139 name="Block_SMB-139"', "", @SW_HIDE)
-RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=445 name="Block_SMB-445"', "", @SW_HIDE)
-RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=137 name="Block_SMB-137"', "", @SW_HIDE)
-RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=138 name="Block_SMB-138"', "", @SW_HIDE)
-RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=139 name="Block_SMB-139"', "", @SW_HIDE)
-			 EndIf
-			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
-			FileCreateShortcut(@AutoItExe, @DesktopDir & "\" & $AppName & ".lnk", @ScriptDir)
-		 else
-		 EndIf
-		 		 RestartScript()
-			Exit
-		 else
-			    _Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_setup_failed)
-						 ProcessClose("openvpn.exe")
-						 FileDelete ($LoginFile)
-   Exit
-EndIf
-EndIf
-
-			Sleep(1000)
-else
-if _Singleton($Appname, 1) = 0 Then
-	       _Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_start_msg2)
-    Exit
-EndIf
-If ProcessExists("openvpn.exe") Then
-       _Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_start_msg3)
-   Exit
-EndIf
-Local $hTimer = TimerInit()
-$Form1 = _Metro_CreateGUI($AppName, 250, 200, -1, -1, true,false)
-$Control_Buttons = _Metro_AddControlButtons(False,False,True,False,True)
-$GUI_MINIMIZE_BUTTON = $Control_Buttons[3]
-$GUI_MENU_BUTTON = $Control_Buttons[6]
-GUISetIcon($sFile)
-GUICtrlCreateLabel($AppName, 50, 7, 80, 30)
-GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
-GUICtrlSetColor(-1, 0xFFFFFF)
-GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-Local $LabelShowIP = GUICtrlCreateLabel($String_not_connected, 150, 150, 300, 30)
-GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
-GUICtrlSetColor(-1, 0xFFFFFF)
-GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-GUICtrlCreateLabel($AppName, 65, 40, 300, 30)
-GUICtrlSetFont(-1, 14, Default, Default, "Segoe UI Light", 5)
-GUICtrlSetColor(-1, 0xFFFFFF)
-GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-$ButtonConnect = _Metro_CreateButtonEx2($String_connect, 70, 85, 99, 50, $ButtonBKColor)
-$ButtonDisconnect = _Metro_CreateButtonEx2($String_disconnect, 70, 85, 99, 50, $ButtonBKColor)
-GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
-$ShowServerLabel = GUICtrlCreateLabel("Server: " & $ServerSaved, 150, 170, 300, 30)
-GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
-GUICtrlSetColor(-1, 0xFFFFFF)
-GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-$link = GUICtrlCreateLabel("Vers: " & $ReadVersion & " / " & $String_website, 10, 170, 300, 30)
-GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
-GUICtrlSetColor(-1, 0xFFFFFF)
-GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-       Local $iStatus = TrayCreateItem($String_not_connected)
-TrayItemSetState ($iStatus, $TRAY_DISABLE)
-TrayCreateItem("") ; Create a separator line.
-       Local $iOpen = TrayCreateItem($String_open)
-	   	   If $AuthSetting >0 then
-	   	   Local $iLogin = TrayCreateItem($String_login)
-		  Else
-	   	   Local $iLogin = ""
-		   EndIf
-	   If $ChatSetting >0 then
-		 Local $iOpenChat = TrayCreateItem("Chat")
-		 TrayItemSetState ($iOpenChat, $TRAY_ENABLE)
-		  Else
-		 Local $iOpenChat = ""
-		 TrayItemSetState ($iOpenChat, $TRAY_DISABLE)
-EndIf
-
-	   TrayCreateItem("") ; Create a separator line.
-    Local $iAutoConnect = TrayCreateItem($String_autoconnect, -1, -1, $TRAY_ITEM_NORMAL)
-			 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
-   Local $iAutostart = TrayCreateItem($String_autostart)
-   Local $iDesktopIcon = TrayCreateItem($String_shortcut)
-   if FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
-			TrayItemSetState ($iDesktopIcon, $TRAY_DISABLE)
-			Else
-			TrayItemSetState ($iDesktopIcon, $TRAY_ENABLE)
-			EndIf
-    TrayCreateItem("") ; Create a separator line.
-    Local $iWebsite = TrayCreateItem("Vers: " & $ReadVersion & " / " & $String_website, -1, -1, $TRAY_ITEM_NORMAL)
-    Local $idExit = TrayCreateItem($String_close)
-   $AutoConnectSetting = IniRead($SettingsFile, "Settings", "AutoConnect", "")
-If $AutoConnectSetting >0 then
-		 TrayItemSetState ($iAutoConnect, $TRAY_CHECKED)
-		 Run($Connect, "", @SW_HIDE)
-		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
-		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
-		 TraySetState(1)
-		 GUISetState(@SW_HIDE, $Form1)
-		 sleep(1000)
-				If ProcessExists("openvpn.exe") Then
-		 GUICtrlSetData($LabelShowIP,$String_determine_ip)
-		 TrayItemSetText($iStatus, $String_determine_ip)
-		 $aArray = _IPDetails()
-		 $sData = 'IP: ' & $aArray[1]
-		 if $aArray[1] Then
-		 TrayTip($String_connected, 'IP: ' & $aArray[1], 3, $TIP_ICONASTERISK)
-		 EndIf
-	  Else
-		 TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
-		 TrayItemSetText($iStatus, $String_not_connected)
-		 GUICtrlSetData($LabelShowIP,$String_not_connected)
-		 ProcessClose("openvpn.exe")
-		 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
-		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
-				GUISetState(@SW_SHOW)
-EndIf
-   else
-	  				GUISetState(@SW_SHOW)
-
-   EndIf
-EndIf
-
-Func _RandomText($length)
-    $text = ""
-    For $i = 1 To $length
-        $temp = Random(65, 122, 1)
-        While $temp >= 90 And $temp <= 96
-            $temp = Random(65, 122, 1)
-        WEnd
-        $temp = Chr($temp)
-        $text &= $temp
-    Next
-    Return $text
- EndFunc
-
-Func ServerList()
-			$GUIServer = _Metro_CreateGUI($AppName, 160, 80, -1, -1, false,false)
-			$ContentList = IniReadSectionNames($ServerList)
-			$Chooser = GUICtrlCreateCombo("", 30, 15, 99, 25, BitOR($CBS_DROPDOWNLIST,$CBS_AUTOHSCROLL))
-			GUICtrlSetData($Chooser, _ArraytoString($ContentList, "|", 1), $ContentList[1])
-			$ButtonServerOK = _Metro_CreateButtonEx2($String_apply, 40, 40, 80, 30, $ButtonBKColor)
-			GUICtrlSetState($Chooser, $GUI_SHOW)
-			GUISetState(@SW_SHOW, $GUIServer)
-
-While 1
-    $nMsg = GUIGetMsg()
-    Switch $nMsg
-	Case $ButtonServerOK
-	  $ChooserPick = GUICtrlRead($Chooser)
-	  IniWrite($SettingsFile, "Settings", "Server", $ChooserPick)
-	      _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_server_switched)
-				_GUIDisable($GUIServer)
-		 _Metro_GUIDelete($GUIServer)
-		 ProcessClose("openvpn.exe")
-		 RestartScript()
-		 Exit
-	  EndSwitch
-	  WEnd
-   EndFunc
-
-Func LanguageList()
-			$GUIServer = _Metro_CreateGUI($AppName, 160, 80, -1, -1, false,false)
-			#$ContentList = IniReadSectionNames($ServerList)
-			$English = "en"
-			$German = "de"
-			$LangList = $German & "|" & $English
-			$Chooser = GUICtrlCreateCombo("", 30, 15, 99, 25, BitOR($CBS_DROPDOWNLIST,$CBS_AUTOHSCROLL))
-			GUICtrlSetData($Chooser, $LangList,$English)
-			$ButtonServerOK = _Metro_CreateButtonEx2($String_apply, 40, 40, 80, 30, $ButtonBKColor)
-			GUICtrlSetState($Chooser, $GUI_SHOW)
-			GUISetState(@SW_SHOW, $GUIServer)
-
-While 1
-    $nMsg = GUIGetMsg()
-    Switch $nMsg
-	Case $ButtonServerOK
-	  $ChooserPick = GUICtrlRead($Chooser)
-	  IniWrite($SettingsFile, "Settings", "Language", $ChooserPick)
-	      _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_lang_switched)
-				_GUIDisable($GUIServer)
-		 _Metro_GUIDelete($GUIServer)
-		 ProcessClose("openvpn.exe")
-		 RestartScript()
-		 Exit
-	  EndSwitch
-	  WEnd
-   EndFunc
-
-Func _Ping()
-   $Ping = _Metro_InputBox2("Ping Client", 15, "1", False, False)
-    Local $iPing = Ping($ServerSubnet & $Ping, 600)
-
-    If $iPing Then
-	  _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_client_ping & $iPing & "ms.")
-    Else
-	  _Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_client_ping_failed)
-	 EndIf
- EndFunc
-
-While 1
-    $nMsg = GUIGetMsg()
-    Switch $nMsg
-			   Case $GUI_MINIMIZE_BUTTON
-			   TraySetState(1)
-			   GUISetState(@SW_HIDE, $Form1)
-			Case $link
-			ShellExecute("https://playhide.eu")
-
-		 Case $LabelShowIP
-			$aArray = _IPDetails()
-			If $aArray[1] Then
-		$MAC = GET_MAC($sData)
-		 _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, "MAC: " & $MAC)
-		 ClipPut($MAC)
-		 _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_mac_copy)
-		 _GUIDisable($Form1)
-		 EndIf
-		 Case $ButtonConnect
-		 Run($Connect, "", @SW_HIDE)
-		 GUICtrlSetState($ButtonConnect, $GUI_HIDE)
-		 GUICtrlSetState($ButtonDisconnect, $GUI_SHOW)
-		 sleep(500)
-				If ProcessExists("openvpn.exe") Then
-		 TrayItemSetText($iStatus, $String_determine_ip)
-		 GUICtrlSetData($LabelShowIP,$String_determine_ip)
-	  Else
-		 ProcessClose("openvpn.exe")
-		 GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
-		 GUICtrlSetState($ButtonConnect, $GUI_SHOW)
-		 GUICtrlSetData($LabelShowIP,$String_not_connected)
-		 TrayItemSetText($iStatus, $String_not_connected)
-		 _GUIDisable($Form1, 0, 30)
-		 _Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_connection_error)
-				_GUIDisable($Form1)
-EndIf
-		         Case $ButtonDisconnect
-				  ProcessClose("openvpn.exe")
-		 		  GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
-		 		  GUICtrlSetState($ButtonConnect, $GUI_SHOW)
-				  GUICtrlSetData($LabelShowIP,$String_not_connected)
-				  TrayItemSetText($iStatus, $String_not_connected)
-
-		Case $GUI_MENU_BUTTON
-		 Local $MenuButtonsArray[5] = ["Servers", $String_language, $String_network, "Chat", $String_close]
-			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
-			Switch $MenuSelect
-			    Case "0"
-					 ServerList()
-			    Case "1"
-					 LanguageList()
-				Case "2"
-			   	run(".\bin\network-scan.exe")
-			   	Case "3"
-				ShellExecute("http://chat.vpn")
-				Case "4"
-					 ProcessClose("openvpn.exe")
-					_Metro_GUIDelete($Form1)
-					Exit
-			EndSwitch
-
-			 		  EndSwitch
-
-        Switch TrayGetMsg()
-            Case $idExit
-			ProcessClose("openvpn.exe")
-		 _Metro_GUIDelete($Form1)
-		 Exit
-
-	  Case $iOpenChat
-		If $ChatSetting >0 then
-		ShellExecute("http://chat.vpn")
+			RunWait(@ComSpec & " /c " & 'net stop server /y', "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'regedit.exe /S .\tools\Disable-SMB.reg', "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=445 name="Block_SMB-445"', "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=137 name="Block_SMB-137"', "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=138 name="Block_SMB-138"', "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=TCP localport=139 name="Block_SMB-139"', "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=445 name="Block_SMB-445"', "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=137 name="Block_SMB-137"', "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=138 name="Block_SMB-138"', "", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule dir=in action=block protocol=UDP localport=139 name="Block_SMB-139"', "", @SW_HIDE)
 		EndIf
-
-		  Case $iWebsite
-			   ShellExecute("https://playhide.eu")
-
-		 Case $iDesktopIcon
-			if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
+		if Not FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
 			FileCreateShortcut(@AutoItExe, @DesktopDir & "\" & $AppName & ".lnk", @ScriptDir)
-			_GUIDisable($Form1, 0, 30)
-			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_shortcut_info)
-			_GUIDisable($Form1)
-					 else
-			_GUIDisable($Form1, 0, 30)
-			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_shortcut_info2)
-			_GUIDisable($Form1)
-		 EndIf
-
-		 Case $iAutostart
-			if Not FileExists(@StartupDir & "\" & $AppName & ".lnk") Then
-			FileCreateShortcut(@AutoItExe, @StartupDir & "\" & $AppName & ".lnk", @ScriptDir)
-			_GUIDisable($Form1, 0, 30)
-			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_autostart_info)
-			_GUIDisable($Form1)
-		 else
-			FileDelete(@StartupDir & "\" &  $AppName & ".lnk")
-			_GUIDisable($Form1, 0, 30)
-			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_autostart_info2)
-			_GUIDisable($Form1)
-			EndIf
-		  Case $iAutoConnect
-			 if $AutoConnectSetting >0 Then
-			   IniWrite($SettingsFile, "Settings", "AutoConnect", "0")
-			   _GUIDisable($Form1, 0, 30)
-			   _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_autoconnect_info)
-				_GUIDisable($Form1)
-			 else
-				 IniWrite($SettingsFile, "Settings", "AutoConnect", "1")
-				 			      		   			_GUIDisable($Form1, 0, 30)
-			   _Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_autoconnect_info2)
-				_GUIDisable($Form1)
-			 EndIf
-			 Case $iLogin
-			If $AuthSetting >0 then
-			$ReadUsername = FileReadLine($LoginFile,1)
-			$ReadPasswort = FileReadLine($LoginFile,2)
-			$Username = _Metro_InputBox2($String_username, 15, $ReadUsername, False, False)
-			$Passwort = _Metro_InputBox2($String_password, 15, $ReadPasswort, true, False)
-			_GUIDisable($Form1)
-			$file = FileOpen($LoginFile, 2)
-			FileFlush($file)
-			FileWrite($file, $Username & @CRLF)
-			FileWrite($file, $Passwort)
-			FileClose($file)
+		else
+	EndIf
+		 	RestartScript()
+			Exit
+		else
+			_Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_setup_failed)
 			ProcessClose("openvpn.exe")
+			FileDelete ($LoginFile)
+   			Exit
+		EndIf
+	EndIf
+			Sleep(1000)
+		else
+		if _Singleton($Appname, 1) = 0 Then
+	      	_Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_start_msg2)
+    		Exit
+		EndIf
+		If ProcessExists("openvpn.exe") Then
+       		_Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_start_msg3)
+   			Exit
+		EndIf
+			Local $hTimer = TimerInit()
+			$Form1 = _Metro_CreateGUI($AppName, 250, 200, -1, -1, true,false)
+			$Control_Buttons = _Metro_AddControlButtons(False,False,True,False,True)
+			$GUI_MINIMIZE_BUTTON = $Control_Buttons[3]
+			$GUI_MENU_BUTTON = $Control_Buttons[6]
+			GUISetIcon($sFile)
+			GUICtrlCreateLabel($AppName, 50, 7, 80, 30)
+			GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
+			GUICtrlSetColor(-1, 0xFFFFFF)
+			GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+			Local $LabelShowIP = GUICtrlCreateLabel($String_not_connected, 150, 150, 300, 30)
+			GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
+			GUICtrlSetColor(-1, 0xFFFFFF)
+			GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+			GUICtrlCreateLabel($AppName, 65, 40, 300, 30)
+			GUICtrlSetFont(-1, 14, Default, Default, "Segoe UI Light", 5)
+			GUICtrlSetColor(-1, 0xFFFFFF)
+			GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+			$ButtonConnect = _Metro_CreateButtonEx2($String_connect, 70, 85, 99, 50, $ButtonBKColor)
+			$ButtonDisconnect = _Metro_CreateButtonEx2($String_disconnect, 70, 85, 99, 50, $ButtonBKColor)
 			GUICtrlSetState($ButtonDisconnect, $GUI_HIDE)
-			GUICtrlSetState($ButtonConnect, $GUI_HIDE)
-			GUICtrlSetState($ButtonConnect, $GUI_SHOW)
-			GUICtrlSetData($LabelShowIP,$String_not_connected)
-			TrayItemSetText($iStatus, $String_not_connected)
-			EndIf
-   Case $iOpen
-ConsoleWrite("up" & @CRLF)
-$ok = GUISetState(@SW_SHOW)
-ConsoleWrite($ok & @CRLF)
-	  EndSwitch
+			$ShowServerLabel = GUICtrlCreateLabel("Server: " & $ServerSaved, 150, 170, 300, 30)
+			GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
+			GUICtrlSetColor(-1, 0xFFFFFF)
+			GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+			$link = GUICtrlCreateLabel("Vers: " & $ReadVersion & " / " & $String_website, 10, 170, 300, 30)
+			GUICtrlSetFont(-1, 10, Default, Default, "Segoe UI Light", 5)
+			GUICtrlSetColor(-1, 0xFFFFFF)
+			GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+       		Local $iStatus = TrayCreateItem($String_not_connected)
+			TrayItemSetState ($iStatus, $TRAY_DISABLE)
+			TrayCreateItem("") ; Create a separator line.
+       		Local $iOpen = TrayCreateItem($String_open)
+	   	If $AuthSetting >0 then
+	   	   	Local $iLogin = TrayCreateItem($String_login)
+		Else
+	   	   	Local $iLogin = ""
+		EndIf
+#include <playhide\chat.au3>
+	  		TrayCreateItem("") ; Create a separator line.
+    		Local $iAutoConnect = TrayCreateItem($String_autoconnect, -1, -1, $TRAY_ITEM_NORMAL)
+			TrayItemSetState ($iAutoConnect, $TRAY_UNCHECKED)
+   			Local $iAutostart = TrayCreateItem($String_autostart)
+   			Local $iDesktopIcon = TrayCreateItem($String_shortcut)
+   		if FileExists(@DesktopDir & "\" & $AppName & ".lnk") Then
+			TrayItemSetState ($iDesktopIcon, $TRAY_DISABLE)
+		Else
+			TrayItemSetState ($iDesktopIcon, $TRAY_ENABLE)
+		EndIf
+    		TrayCreateItem("") ; Create a separator line.
+    		Local $iWebsite = TrayCreateItem("Vers: " & $ReadVersion & " / " & $String_website, -1, -1, $TRAY_ITEM_NORMAL)
+    		Local $idExit = TrayCreateItem($String_close)
+#include <playhide\autoconnect.au3>
 
-		 If TimerDiff($hTimer) > 5*1000 Then
-		 $Timer = TimerInit()
-		 If ProcessExists("openvpn.exe") Then
-		 $aArray = _IPDetails()
-		 $sData = 'IP: ' & $aArray[1]
-		 if $aArray[1] Then
-		 TrayItemSetText($iStatus, 'IP: ' & $aArray[1])
-		 GUICtrlSetData($LabelShowIP,$sData)
-		 EndIf
-	  Else
-GUICtrlSetData($LabelShowIP,$String_not_connected)
-TrayItemSetText($iStatus, $String_not_connected)
-	  EndIf
-	  		 Local $hTimer = TimerInit()
-    EndIf
+EndIf
+
+While 1
+#include <playhide\switches_ui.au3>
+#include <playhide\switches_tray.au3>
+#include <playhide\timer.au3>
 WEnd
