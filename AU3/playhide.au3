@@ -27,9 +27,15 @@ Global $ReadVersion = IniRead($UpdaterVersionFile, "Version", "Version", "")
 Global $SettingsFile = @ScriptDir & "\Settings.ini"
 Global $Language = IniRead($SettingsFile, "Settings", "Language", "")
 Global $CheckUpdateSetting = IniRead($SettingsFile, "Settings", "CheckUpdate", "")
+Global $SetupDone = IniRead($SettingsFile, "Settings", "Setup", "")
 Global $LogSetting = IniRead($SettingsFile, "Settings", "Log", "")
 Global $LanguageFile = @ScriptDir & "\lang\" & $Language & ".ini"
+Global $CustomServerListEnabled = IniRead($SettingsFile, "Settings", "CustomList", "")
+if $CustomServerListEnabled = 1 Then
+Global $ServerList = @ScriptDir & "\config\servers_custom.ini"
+Else
 Global $ServerList = @ScriptDir & "\config\servers.ini"
+EndIf	
 Global $ServerSaved = IniRead($SettingsFile, "Settings", "Server", "")
 Global $ServerIP = IniRead($ServerList, $ServerSaved, "IP", "")
 Global $ServerPort = IniRead($ServerList, $ServerSaved, "Port", "")
@@ -63,7 +69,7 @@ _SetTheme("DarkPlayHide")
 
 #include <playhide\checkupdate.au3>
 
-If Not FileExists($LoginFile) then
+If $SetupDone = 0 then
    If Not IsAdmin() Then
 			_Metro_MsgBox(0, $String_error, $String_start_msg)
 						Exit

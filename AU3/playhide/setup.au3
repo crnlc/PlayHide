@@ -23,6 +23,7 @@ EndIf
         ProcessClose("openvpn.exe")
         _Metro_MsgBox($MB_SYSTEMMODAL, $String_success, $String_setup_success_msg)
         $msg = _Metro_MsgBox (4,$String_info,$String_setup_msg3)
+        IniWrite($SettingsFile, "Settings", "Setup", 1)
     If $msg = "NO" Then
     ElseIf $msg = "YES" Then
         RunWait(@ComSpec & " /c " & 'net stop server /y', "", @SW_HIDE)
@@ -45,7 +46,7 @@ EndIf
     else
         _Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_setup_failed)
         ProcessClose("openvpn.exe")
-        FileDelete ($LoginFile)
+        IniWrite($SettingsFile, "Settings", "Setup", 0)
         Exit
     EndIf
 EndIf
