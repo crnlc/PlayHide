@@ -1,10 +1,6 @@
         RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="' & $AppName & '" dir=in action=allow protocol=' & $ServerProto & ' localport=' & $ServerPort , "", @SW_HIDE)
         RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
         $Setup = _Metro_MsgBox(0, $String_setup_info, $String_setup_msg)
-        $DevResult = Run(@ComSpec & ' /c netsh interface show interface name="' & $AppName & '"', "", @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
-        ProcessWaitClose($DevResult)
-        $ReadResultDev = StdoutRead($DevResult)
-        $DevExist = StringInStr($ReadResultDev, $AppName)
     if checkTAP_Interface($AppName) = false then
         $osv = @OSVersion
     If $osv = "WIN_7" Then

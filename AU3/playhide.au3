@@ -69,7 +69,7 @@ _SetTheme("DarkPlayHide")
 
 #include <playhide\checkupdate.au3>
 
-If $SetupDone = 0 Or checkTAP_Interface($AppName) = false then
+If $SetupDone = 0 Or checkTAP_Interface($AppName) = false Or Not FileExists($LoginFile)then
    If Not IsAdmin() Then
 			_Metro_MsgBox(0, $String_error, $String_start_msg)
 						Exit

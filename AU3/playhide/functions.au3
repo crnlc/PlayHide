@@ -71,6 +71,14 @@ Func _IPDetails()
     EndIf
  EndFunc
 
+ Func Write_Login($LoginFile,$Username,$Passwort)
+    $file = FileOpen($LoginFile, 2)
+    FileFlush($file)
+    FileWrite($file, $Username & @CRLF)
+    FileWrite($file, $Passwort)
+    FileClose($file)
+ EndFunc
+
 Func RestartScript()
     If @Compiled = 1 Then
         Run( FileGetShortName(@ScriptFullPath))
