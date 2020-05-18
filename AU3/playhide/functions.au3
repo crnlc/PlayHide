@@ -59,6 +59,18 @@ Func _IPDetails()
  EndFunc
 
 
+ Func checkTAP_Interface($AppName)
+    $DevResult = Run(@ComSpec & ' /c netsh interface show interface name="' & $AppName & '"', "", @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+    ProcessWaitClose($DevResult)
+    $ReadResultDev = StdoutRead($DevResult)
+    $DevExist = StringInStr($ReadResultDev, $AppName)
+    if Not $DevExist then
+        Return false
+    Else
+        Return true
+    EndIf
+ EndFunc
+
 Func RestartScript()
     If @Compiled = 1 Then
         Run( FileGetShortName(@ScriptFullPath))

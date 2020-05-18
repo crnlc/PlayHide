@@ -5,7 +5,7 @@
         ProcessWaitClose($DevResult)
         $ReadResultDev = StdoutRead($DevResult)
         $DevExist = StringInStr($ReadResultDev, $AppName)
-    if Not $DevExist then
+    if checkTAP_Interface($AppName) = false then
         $osv = @OSVersion
     If $osv = "WIN_7" Then
         RunWait('driver\tap.exe')
