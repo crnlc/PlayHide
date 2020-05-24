@@ -152,4 +152,17 @@
 - Bugfixes
 
 ### Version 5.1
-- new Updater process
+- new Updater added
+
+### Version 5.2
+- Updated Binaries
+
+### Version 5.3
+- Bugfixes
+
+### Version 5.4
+- Updated Binaries
+- Setup improvements
+
+### Version 5.5
+- added Server Mode

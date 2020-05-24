@@ -43,9 +43,25 @@ Switch $nMsg
 			TrayItemSetText($iStatus, $String_not_connected)
 
 	Case $GUI_MENU_BUTTON
+		if $ServerMode = 1 Then
+			Local $MenuButtonsArray[5] = [$String_language, $String_network, $String_close]
+			Else
 			Local $MenuButtonsArray[5] = ["Servers", $String_language, $String_network, "Chat", $String_close]
+			EndIf
 			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
 
+		if $ServerMode = 1 Then
+			Switch $MenuSelect
+				Case "0"
+						LanguageList()
+				Case "1"
+						run(".\bin\network-scan.exe")
+				Case "2"
+						ProcessClose("openvpn.exe")
+						_Metro_GUIDelete($Form1)
+						Exit
+				EndSwitch
+			Else
 Switch $MenuSelect
 	Case "0"
 			ServerList()
@@ -59,6 +75,7 @@ Switch $MenuSelect
 			ProcessClose("openvpn.exe")
 			_Metro_GUIDelete($Form1)
 			Exit
-
 	EndSwitch
+EndIf
+	
 EndSwitch

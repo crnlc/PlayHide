@@ -28,14 +28,31 @@ Global $SettingsFile = @ScriptDir & "\Settings.ini"
 Global $Language = IniRead($SettingsFile, "Settings", "Language", "")
 Global $CheckUpdateSetting = IniRead($SettingsFile, "Settings", "CheckUpdate", "")
 Global $SetupDone = IniRead($SettingsFile, "Settings", "Setup", "")
+Global $ServerMode = IniRead($SettingsFile, "Settings", "ServerMode", "")
 Global $LogSetting = IniRead($SettingsFile, "Settings", "Log", "")
 Global $LanguageFile = @ScriptDir & "\lang\" & $Language & ".ini"
 Global $CustomServerListEnabled = IniRead($SettingsFile, "Settings", "CustomList", "")
+
 if $CustomServerListEnabled = 1 Then
 Global $ServerList = @ScriptDir & "\config\servers_custom.ini"
 Else
 Global $ServerList = @ScriptDir & "\config\servers.ini"
 EndIf	
+
+if $ServerMode = 1 Then
+Global $ServerSaved = "Host"
+Global $ServerIP = IniRead($SettingsFile, "Server", "IP", "")
+Global $ServerPort = IniRead($SettingsFile, "Server", "Port", "")
+Global $ServerProto = IniRead($SettingsFile, "Server", "Protocol", "")
+Global $ServerDev = IniRead($SettingsFile, "Server", "Interface", "")
+Global $ServerSubnet = IniRead($SettingsFile, "Server", "Subnet", "")
+Global $ServerSubnetMask = IniRead($SettingsFile, "Server", "SubnetMask", "")
+Global $ServerStartRange = IniRead($SettingsFile, "Server", "StartRange", "")
+Global $ServerEndRange = IniRead($SettingsFile, "Server", "EndRange", "")
+Global $ServerCA = IniRead($SettingsFile, "Server", "Cert", "")
+Global $ServerMaxClients = IniRead($SettingsFile, "Server", "MaxClients", "")
+Global $ServerDHCP = $ServerSubnet & '0'
+Else
 Global $ServerSaved = IniRead($SettingsFile, "Settings", "Server", "")
 Global $ServerIP = IniRead($ServerList, $ServerSaved, "IP", "")
 Global $ServerPort = IniRead($ServerList, $ServerSaved, "Port", "")
@@ -44,17 +61,27 @@ Global $ServerDev = IniRead($ServerList, $ServerSaved, "Interface", "")
 Global $ServerSubnet = IniRead($ServerList, $ServerSaved, "Subnet", "")
 Global $ServerDHCP = IniRead($ServerList, $ServerSaved, "DHCP_Server", "")
 Global $ServerCA = IniRead($ServerList, $ServerSaved, "Cert", "")
+EndIf
+
 Global $ServerConfig = IniRead($ServerList, $ServerSaved, "Config", "")
 Global $ServerLogin = IniRead($ServerList, $ServerSaved, "Login", "")
 Global $LoginFile =  ".\config\" & $ServerLogin
+
 If $LogSetting >0 then
 DirCreate(".\logs")
 Global $ParamsLog = "--verb " & $LogSetting & " --log-append .\logs\openvpn.log"
 else
 Global $ParamsLog = ""
 EndIf
+
+if $ServerMode = 1 Then
+Global $Params = "--mode server --tls-server --resolv-retry infinite --keepalive 10 60 --reneg-sec 432000 --persist-key --persist-tun --client-cert-not-required --cipher AES-128-CBC --client-to-client --username-as-common-name --compress lz4-v2 --duplicate-cn --remote-cert-tls server --verb 0 --mute-replay-warnings --ca .\certs\server\ca.crt --cert .\certs\server\server.crt --key .\certs\server\server.key --dh .\certs\server\dh2048.pem --script-security 3 --auth-user-pass-verify .\config\auth.bat via-env --client-config-dir .\config\clients " & $ParamsLog
+Global $RouteParams = '--route ' & $ServerSubnet & '0 ' & $ServerSubnetMask & ' --push "route ' & $ServerSubnet & '0 ' & $ServerSubnetMask & '"' & ' --push "route-metric 1"'
+Global $ConnectSetup = @ComSpec & " /c " & 'bin\openvpn.exe ' & $Params & ' ' & $RouteParams & ' --server-bridge ' & $ServerIP & ' 255.255.255.0 ' & $ServerSubnet & $ServerStartRange & ' ' & $ServerSubnet & $ServerEndRange & ' --port ' & $ServerPort & ' --proto ' & $ServerProto & ' --dev ' & $ServerDev & ' --config .\config\server.ovpn' & ' --ifconfig ' & $ServerIP & ' ' & $ServerSubnetMask & ' --max-clients ' & $ServerMaxClients
+Else
 Global $Params = "--client --nobind --resolv-retry infinite --persist-key --persist-tun --auth-nocache --remote-cert-tls server --mute-replay-warnings " & $ParamsLog
 Global $ConnectSetup = @ComSpec & " /c " & 'bin\openvpn.exe ' & $Params & ' --remote ' & $ServerIP & ' ' & $ServerPort & ' --ca .\certs\' & $ServerCA & ' --dev ' & $ServerDev & ' --proto ' & $ServerProto & ' --config .\config\' & $ServerConfig & ' --auth-user-pass ' & $LoginFile
+EndIf
 Global $Connect = $ConnectSetup & ' --dev-node "' & $AppName & '"'
 Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 Global $AuthSetting = IniRead($SettingsFile, "Settings", "Auth", "")
@@ -69,7 +96,7 @@ _SetTheme("DarkPlayHide")
 
 #include <playhide\checkupdate.au3>
 
-If $SetupDone = 0 Or checkTAP_Interface($AppName) = false Or Not FileExists($LoginFile)then
+If checkTAP_Interface($AppName) = false Or Not FileExists($LoginFile)then
    If Not IsAdmin() Then
 			_Metro_MsgBox(0, $String_error, $String_start_msg)
 						Exit
