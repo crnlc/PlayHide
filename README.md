@@ -55,5 +55,5 @@ _Tested with Call of Duty WWII & other Games under Windows 7 / 10 / 8.1_
 - Connection Limit from Subnet (254 Clients)
 
 ### Support?
-Discord: https://discord.gg/zrZ5ynF
-Matrix: https://matrix.to/#/!SOURRwFRWskoKWLiTQ:matrix.3dns.eu?via=matrix.3dns.eu
+#### Discord: https://discord.gg/zrZ5ynF
+#### Matrix: https://matrix.to/#/!SOURRwFRWskoKWLiTQ:matrix.3dns.eu?via=matrix.3dns.eu
