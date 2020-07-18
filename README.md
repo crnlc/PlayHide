@@ -53,3 +53,7 @@ _Tested with Call of Duty WWII & other Games under Windows 7 / 10 / 8.1_
 - More Ethernet Devices could be issue *currently not tested.
 - Make sure only one Ethernet & no other VPN Client are running. (Metric conflict)
 - Connection Limit from Subnet (254 Clients)
+
+### Support?
+Discord: https://discord.gg/zrZ5ynF
+Matrix: https://matrix.to/#/!SOURRwFRWskoKWLiTQ:matrix.3dns.eu?via=matrix.3dns.eu
