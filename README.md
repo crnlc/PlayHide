@@ -57,3 +57,5 @@ _Tested with Call of Duty WWII & other Games under Windows 7 / 10 / 8.1_
 ### Support?
 #### Discord: https://discord.gg/zrZ5ynF
 #### Matrix: https://matrix.to/#/!SOURRwFRWskoKWLiTQ:matrix.3dns.eu?via=matrix.3dns.eu
+
+##### Spend me a BeerSuchergebnisse 🍺 https://www.paypal.me/dom1nic
