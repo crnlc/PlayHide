@@ -1,25 +1,24 @@
+    if checkTAP_Interface($AppName) = false then
         RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="' & $AppName & '" dir=in action=allow protocol=' & $ServerProto & ' localport=' & $ServerPort , "", @SW_HIDE)
         RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
-        $Setup = _Metro_MsgBox(0, $String_setup_info, $String_setup_msg)
-    if checkTAP_Interface($AppName) = false then
+        #_Metro_MsgBox(0, $String_setup_info, $String_setup_msg)
         $osv = @OSVersion
     If $osv = "WIN_7" Then
         RunWait('driver\tap.exe')
     Else
-        RunWait('driver\tap-win10.exe')
+        RunWait(@ComSpec & " /c " & 'driver\tapinstall.exe install driver\Win10\OemVista.inf tap0901' , "", @SW_HIDE)
     EndIf
 EndIf
         Run($ConnectSetup, "", @SW_HIDE)
         _Metro_MsgBox(0, $String_info, $String_setup_msg2)
         Sleep(15000)
-    If ProcessExists("openvpn.exe") And Ping($ServerSubnet & "1") Or $ServerMode = 1 Then
+    If ProcessExists("openvpn.exe") And Ping($ServerSubnet & "1") Then
         Sleep(100)
         RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1" -Subnet ' & $ServerSubnet & '* -Name ' & '"' & $AppName & '"', "", @SW_HIDE)
         RunWait('netsh interface ipv4 set interface "' &  $AppName & '" metric=1')
         ProcessClose("openvpn.exe")
         _Metro_MsgBox($MB_SYSTEMMODAL, $String_success, $String_setup_success_msg)
         $msg = _Metro_MsgBox (4,$String_info,$String_setup_msg3)
-        IniWrite($SettingsFile, "Settings", "Setup", 1)
     If $msg = "NO" Then
     ElseIf $msg = "YES" Then
         RunWait(@ComSpec & " /c " & 'net stop server /y', "", @SW_HIDE)
