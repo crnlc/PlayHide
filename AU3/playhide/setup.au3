@@ -4,9 +4,9 @@
         #_Metro_MsgBox(0, $String_setup_info, $String_setup_msg)
         $osv = @OSVersion
     If $osv = "WIN_7" Then
-        RunWait('driver\tap.exe')
+        RunWait(@ComSpec & " /c " & 'driver\Win7\tapinstall.exe install driver\Win7\OemVista.inf tap0901' , "", @SW_HIDE)
     Else
-        RunWait(@ComSpec & " /c " & 'driver\tapinstall.exe install driver\Win10\OemVista.inf tap0901' , "", @SW_HIDE)
+        RunWait(@ComSpec & " /c " & 'driver\Win10\tapinstall.exe install driver\Win10\OemVista.inf tap0901' , "", @SW_HIDE)
     EndIf
 EndIf
         Run($ConnectSetup, "", @SW_HIDE)
