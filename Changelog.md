@@ -166,3 +166,11 @@
 
 ### Version 5.5
 - added Server Mode
+
+### Version 5.6
+- Native TAP Install without extra Setup
+
+### Version 5.7
+- Network Scanner now use Subnet for Client searching
+- fixed Setup Stuff again
+- Updated last OpenVPN Binaries
