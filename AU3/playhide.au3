@@ -37,7 +37,7 @@ if $CustomServerListEnabled = 1 Then
 Global $ServerList = @ScriptDir & "\config\servers_custom.ini"
 Else
 Global $ServerList = @ScriptDir & "\config\servers.ini"
-EndIf	
+EndIf
 
 if $ServerMode = 1 Then
 Global $ServerSaved = "Host"
@@ -75,7 +75,7 @@ Global $ParamsLog = ""
 EndIf
 
 if $ServerMode = 1 Then
-Global $Params = "--mode server --tls-server --resolv-retry infinite --keepalive 10 60 --reneg-sec 432000 --persist-key --persist-tun --client-cert-not-required --cipher AES-128-CBC --client-to-client --username-as-common-name --compress lz4-v2 --duplicate-cn --remote-cert-tls server --verb 0 --mute-replay-warnings --ca .\certs\server\ca.crt --cert .\certs\server\server.crt --key .\certs\server\server.key --dh .\certs\server\dh2048.pem --script-security 3 --auth-user-pass-verify .\config\auth.bat via-env --client-config-dir .\config\clients " & $ParamsLog
+Global $Params = "--mode server --tls-server --resolv-retry infinite --keepalive 10 60 --reneg-sec 432000 --persist-key --persist-tun --verify-client-cert none --cipher AES-128-CBC --client-to-client --username-as-common-name --compress lz4-v2 --duplicate-cn --remote-cert-tls server --verb 0 --mute-replay-warnings --ca .\certs\server\ca.crt --cert .\certs\server\server.crt --key .\certs\server\server.key --dh .\certs\server\dh2048.pem --script-security 3 --auth-user-pass-verify .\config\auth.bat via-env --client-config-dir .\config\clients " & $ParamsLog
 Global $RouteParams = '--route ' & $ServerSubnet & '0 ' & $ServerSubnetMask & ' --push "route ' & $ServerSubnet & '0 ' & $ServerSubnetMask & '"' & ' --push "route-metric 1"'
 Global $ConnectSetup = @ComSpec & " /c " & 'bin\openvpn.exe ' & $Params & ' ' & $RouteParams & ' --server-bridge ' & $ServerIP & ' 255.255.255.0 ' & $ServerSubnet & $ServerStartRange & ' ' & $ServerSubnet & $ServerEndRange & ' --port ' & $ServerPort & ' --proto ' & $ServerProto & ' --dev ' & $ServerDev & ' --config .\config\server.ovpn' & ' --ifconfig ' & $ServerIP & ' ' & $ServerSubnetMask & ' --max-clients ' & $ServerMaxClients
 Else
@@ -96,12 +96,12 @@ _SetTheme("DarkPlayHide")
 
 #include <playhide\checkupdate.au3>
 
-If checkTAP_Interface($AppName) = false Or Not FileExists($LoginFile)then
+If checkTAP_Interface($AppName) = false Or Not FileExists($LoginFile) then
    If Not IsAdmin() Then
 			_Metro_MsgBox(0, $String_error, $String_start_msg)
 						Exit
 					 else
-			If Not FileExists($LoginFile) then
+			If Not FileExists($LoginFile) And $ServerMode = 0 then
 #include <playhide\auth.au3>
 				EndIf
 #include <playhide\setup.au3>

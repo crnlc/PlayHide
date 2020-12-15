@@ -27,50 +27,23 @@ if _Singleton($Appname, 1) = 0 Then
 	       _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "Scanner already run!")
     Exit
  EndIf
-			if Not ProcessExists("openvpn.exe") then
-			_Metro_MsgBox($MB_SYSTEMMODAL, "Error", "Connect PlayHide VPN!")
-			Exit
-			 EndIf
+if Not ProcessExists("openvpn.exe") then
+   _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "Connect PlayHide VPN!")
+   Exit
+EndIf
 ;~ $HowManyReq = 1 ; number of ping requests in _MSPing
 $TimeoutDefault = 500 ; timeout in miliseconds
 Global $HostName, $WhichList, $List, $Used, $StartTime, $Finished, $CurrentIP, $CurrentIndex, $FreeCount, $Progress, $CurrentlyScanning, $FinishMessage, $fDblClkMessage
 Global Const $MAX_PROCESS = 30 ; maximum processes at once
 Global $fDblClk = False, $aLV_Click_Info
 
-$Found = 0 ;how many active connections you have
-$LocalIP1 = @IPAddress1
-If $LocalIP1 <> "0.0.0.0" Then $Found += 1
+$ChosenIP = $CmdLine[1]
 
-If $Found == 0 Then
-	MsgBox(16, "OOPS", "There are no adapters with an IP address present.  Please check your adapters and cables.")
-	Exit
+if ($ChosenIP == "") Then
+      _Metro_MsgBox($MB_SYSTEMMODAL, "Error", "Connect PlayHide VPN!")
+Exit
 EndIf
-If $Found > 1 Then ; if there is more than one network available you will be prompted to choose which to scan
-	$Choose = GUICreate("Choose an IP range", 240, 115, (@DesktopWidth / 2) - 120, @DesktopHeight / 4)
-	GUISetBkColor(0xb2ccff, $Choose)
-	GUISetFont(8.5)
-	$IPShow = StringSplit($LocalIP1, ".")
-	$Button1 = GUICtrlCreateButton($IPShow[1] & "." & $IPShow[2] & "." & $IPShow[3] & ".xxx", 5, 5, 110, 40)
-	$IPShow = StringSplit($LocalIP2, ".")
-	$Button2 = GUICtrlCreateButton($IPShow[1] & "." & $IPShow[2] & "." & $IPShow[3] & ".xxx", 125, 5, 110, 40)
-	$IPShow = StringSplit($LocalIP3, ".")
-	$Button3 = GUICtrlCreateButton($IPShow[1] & "." & $IPShow[2] & "." & $IPShow[3] & ".xxx", 5, 50, 110, 40)
-	$IPShow = StringSplit($LocalIP4, ".")
-	$Button4 = GUICtrlCreateButton($IPShow[1] & "." & $IPShow[2] & "." & $IPShow[3] & ".xxx", 125, 50, 110, 40)
-	If @IPAddress1 == "0.0.0.0" Then GUICtrlDelete($Button1)
-	GUISetState(@SW_SHOW, "Choose an IP range")
-	Do
-		$MSG = GUIGetMsg()
-		If $MSG == $GUI_EVENT_CLOSE Then Exit
-		If $MSG == $Button1 Then
-			$ChosenIP = @IPAddress1
-			ExitLoop
-		EndIf
-	Until 1 == 2
-	GUIDelete("Choose an IP range")
-Else ; if only one network is available, skip the selection GUI and go
-	If $LocalIP1 <> "0.0.0.0" Then $ChosenIP = $LocalIP1
-EndIf
+
 $GUI = _Metro_CreateGUI("Network Scan", 340, 360, -1, -1, true,false)
 $Control_Buttons = _Metro_AddControlButtons(True,False,False,False,False)
 $GUI_CLOSE_BUTTON = $Control_Buttons[0]

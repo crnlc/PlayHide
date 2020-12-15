@@ -2,19 +2,21 @@
         RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="' & $AppName & '" dir=in action=allow protocol=' & $ServerProto & ' localport=' & $ServerPort , "", @SW_HIDE)
         RunWait(@ComSpec & " /c " & 'netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow' , "", @SW_HIDE)
         #_Metro_MsgBox(0, $String_setup_info, $String_setup_msg)
+
         $osv = @OSVersion
     If $osv = "WIN_7" Then
         RunWait(@ComSpec & " /c " & 'driver\Win7\tapinstall.exe install driver\Win7\OemVista.inf tap0901' , "", @SW_HIDE)
     Else
         RunWait(@ComSpec & " /c " & 'driver\Win10\tapinstall.exe install driver\Win10\OemVista.inf tap0901' , "", @SW_HIDE)
     EndIf
-EndIf
-        Run($ConnectSetup, "", @SW_HIDE)
+ EndIf
+	  $Params = "--mode server --tls-server --resolv-retry infinite --keepalive 10 60 --reneg-sec 432000 --persist-key --persist-tun --cipher AES-128-CBC --client-to-client --remote-cert-tls server --verb 0 --mute-replay-warnings --ca .\certs\server\ca.crt --cert .\certs\server\server.crt --key .\certs\server\server.key --dh .\certs\server\dh2048.pem"
+	  $SelfTest = @ComSpec & " /c " & 'bin\openvpn.exe ' & $Params & ' --port 1400 --dev tap --proto udp --ifconfig 172.16.0.1 255.255.255.0'
+        Run($SelfTest, "", @SW_HIDE)
         _Metro_MsgBox(0, $String_info, $String_setup_msg2)
         Sleep(15000)
-    If ProcessExists("openvpn.exe") And Ping($ServerSubnet & "1") Then
-        Sleep(100)
-        RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1" -Subnet ' & $ServerSubnet & '* -Name ' & '"' & $AppName & '"', "", @SW_HIDE)
+    If ProcessExists("openvpn.exe") Then
+        RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1" -ip 172.16.0.1 -name "' & $AppName & '"', "", @SW_HIDE)
         RunWait('netsh interface ipv4 set interface "' &  $AppName & '" metric=1')
         ProcessClose("openvpn.exe")
         _Metro_MsgBox($MB_SYSTEMMODAL, $String_success, $String_setup_success_msg)

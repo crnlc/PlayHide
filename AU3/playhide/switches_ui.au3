@@ -54,8 +54,11 @@ Switch $nMsg
 			Switch $MenuSelect
 				Case "0"
 						LanguageList()
-				Case "1"
-						run(".\bin\network-scan.exe")
+					 Case "1"
+						$aArray = _IPDetails()
+					 If $aArray[1] Then
+						run(".\bin\network-scan.exe " & $aArray[1])
+					 EndIf
 				Case "2"
 						ProcessClose("openvpn.exe")
 						_Metro_GUIDelete($Form1)
@@ -68,7 +71,10 @@ Switch $MenuSelect
 	Case "1"
 			LanguageList()
 	Case "2"
-			run(".\bin\network-scan.exe")
+			$aArray = _IPDetails()
+		 If $aArray[1] Then
+			run(".\bin\network-scan.exe " & $aArray[1])
+		 EndIf
 	Case "3"
 			ShellExecute("http://chat.vpn")
 	Case "4"
@@ -77,5 +83,5 @@ Switch $MenuSelect
 			Exit
 	EndSwitch
 EndIf
-	
+
 EndSwitch
