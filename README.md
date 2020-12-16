@@ -2,6 +2,11 @@
 
 Build with Autoit & host in EU
 
+#### Support
+- Windows 10 & 7 
+
+```Windows 7 with Update (Win7-KB3191566 https://www.microsoft.com/en-us/download/details.aspx?id=54616) required```
+
 ### Client
 ![Screenshot](https://github.com/DoM1niC/PlayHide/blob/master/res/client.png?raw=true)
 
@@ -30,9 +35,7 @@ _*Only Client to Client / no Traffic Gateway_
 - Full Open Source with OpenVPN
 
 ### Kontra:
-- Chats
-
-_Tested with Call of Duty WWII & other Games under Windows 7 / 10 / 8.1_
+- Messenging / Chats
 
 ## ![Changelogs](Changelog.md)
 
