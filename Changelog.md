@@ -174,3 +174,6 @@
 - Network Scanner now use Subnet for Client searching
 - fixed Setup Stuff again
 - Updated last OpenVPN Binaries
+
+### Version 5.8
+- Win8 / 8.1 Support (THX LuKeStorm for testing)

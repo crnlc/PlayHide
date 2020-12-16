@@ -6,6 +6,8 @@
         $osv = @OSVersion
     If $osv = "WIN_7" Then
         RunWait(@ComSpec & " /c " & 'driver\Win7\tapinstall.exe install driver\Win7\OemVista.inf tap0901' , "", @SW_HIDE)
+	  ElseIf $osv = "WIN_8" Or $osv = "WIN_81" Then
+        RunWait(@ComSpec & " /c " & 'driver\Win7\tapinstall.exe install driver\Win7\OemVista.inf tap0901' , "", @SW_HIDE)
     Else
         RunWait(@ComSpec & " /c " & 'driver\Win10\tapinstall.exe install driver\Win10\OemVista.inf tap0901' , "", @SW_HIDE)
     EndIf
@@ -14,7 +16,7 @@
 	  $SelfTest = @ComSpec & " /c " & 'bin\openvpn.exe ' & $Params & ' --port 1400 --dev tap --proto udp --ifconfig 172.16.0.1 255.255.255.0'
         Run($SelfTest, "", @SW_HIDE)
         _Metro_MsgBox(0, $String_info, $String_setup_msg2)
-        Sleep(15000)
+        Sleep(5000)
     If ProcessExists("openvpn.exe") Then
         RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1" -ip 172.16.0.1 -name "' & $AppName & '"', "", @SW_HIDE)
         RunWait('netsh interface ipv4 set interface "' &  $AppName & '" metric=1')
