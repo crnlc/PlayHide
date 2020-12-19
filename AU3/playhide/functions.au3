@@ -54,6 +54,36 @@ Func _IPDetails()
                 $aReturn[1] = $oObjectItem.IPAddress(0)
             EndIf
         Next
+	 EndIf
+    Return SetError($aReturn[0] = 0, 0, $aReturn)
+
+ EndFunc
+
+  Func GetAdapterIndex($ip)
+    Local $oWMIService = ObjGet('winmgmts:\\' & '.' & '\root\cimv2')
+    Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapterConfiguration Where DHCPServer="' & $ip & '"', 'WQL', 0x30), $aReturn[5] = [0]
+    If IsObj($oColItems) Then
+        For $oObjectItem In $oColItems
+            If $oObjectItem.Index(0) Then
+                $aReturn[0] = 4
+                $aReturn[1] = $oObjectItem.Index(0)
+            EndIf
+        Next
+	 EndIf
+    Return SetError($aReturn[0] = 0, 0, $aReturn)
+ EndFunc
+
+ Func GetConnectionID($ip)
+   $aArray = GetAdapterIndex($ip)
+    Local $oWMIService = ObjGet('winmgmts:\\' & '.' & '\root\cimv2')
+    Local $oColItems = $oWMIService.ExecQuery('Select NetConnectionId From Win32_NetworkAdapter Where index='& $aArray[1] & ' ', 'WQL', 0x30), $aReturn[5] = [0]
+    If IsObj($oColItems) Then
+        For $oObjectItem In $oColItems
+            If $oObjectItem.NetConnectionId(0) Then
+                $aReturn[0] = 4
+                $aReturn[1] = $oObjectItem.NetConnectionId(0)
+            EndIf
+        Next
     EndIf
     Return SetError($aReturn[0] = 0, 0, $aReturn)
  EndFunc

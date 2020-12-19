@@ -18,7 +18,10 @@
         _Metro_MsgBox(0, $String_info, $String_setup_msg2)
         Sleep(5000)
     If ProcessExists("openvpn.exe") Then
-        RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1" -ip 172.16.0.1 -name "' & $AppName & '"', "", @SW_HIDE)
+        #RunWait(@ComSpec & " /c " & 'Powershell.exe -executionpolicy Bypass -File "driver\SetAdapter.ps1" -ip 172.16.0.1 -name "' & $AppName & '"', "", @SW_HIDE)
+		 $aArray = GetConnectionID("172.16.0.0")
+
+	    RunWait('netsh interface set interface name="' & $aArray[1] & '" newname="' & $AppName & '"')
         RunWait('netsh interface ipv4 set interface "' &  $AppName & '" metric=1')
         ProcessClose("openvpn.exe")
         _Metro_MsgBox($MB_SYSTEMMODAL, $String_success, $String_setup_success_msg)

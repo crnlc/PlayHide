@@ -177,3 +177,6 @@
 
 ### Version 5.8
 - Win8 / 8.1 Support (THX LuKeStorm for testing)
+
+### Version 5.9
+- Setup Process improved (removed PowerShell Helper Script)
