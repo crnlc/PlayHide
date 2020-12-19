@@ -5,8 +5,6 @@ Build with Autoit & host in EU
 #### Support
 - Windows 7 / 8 / 8.1 / 10 +
 
-```Windows 7 with Update (Win7-KB3191566 https://www.microsoft.com/en-us/download/details.aspx?id=54616) required```
-
 ### Client
 ![Screenshot](https://github.com/DoM1niC/PlayHide/blob/master/res/client.png?raw=true)
 
