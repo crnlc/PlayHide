@@ -3,7 +3,7 @@
 Build with Autoit & host in EU
 
 #### Support
-- Windows 10 & 7 
+- Windows 7 / 8 / 8.1 / 10 +
 
 ```Windows 7 with Update (Win7-KB3191566 https://www.microsoft.com/en-us/download/details.aspx?id=54616) required```
 
