@@ -10,8 +10,8 @@
         RunWait(@ComSpec & " /c " & 'driver\Win7\tapinstall.exe install driver\Win7\OemVista.inf tap0901' , "", @SW_HIDE)
     Else
         RunWait(@ComSpec & " /c " & 'driver\Win10\tapinstall.exe install driver\Win10\OemVista.inf tap0901' , "", @SW_HIDE)
-    EndIf
- EndIf
+	 EndIf
+
 	  $Params = "--mode server --tls-server --resolv-retry infinite --keepalive 10 60 --reneg-sec 432000 --persist-key --persist-tun --cipher AES-128-CBC --client-to-client --remote-cert-tls server --verb 0 --mute-replay-warnings --ca .\certs\server\ca.crt --cert .\certs\server\server.crt --key .\certs\server\server.key --dh .\certs\server\dh2048.pem"
 	  $SelfTest = @ComSpec & " /c " & 'bin\openvpn.exe ' & $Params & ' --port 1400 --dev tap --proto udp --ifconfig 172.16.0.1 255.255.255.0'
         Run($SelfTest, "", @SW_HIDE)
@@ -52,4 +52,5 @@ EndIf
         Exit
     EndIf
 EndIf
-        Sleep(1000)
+
+ EndIf

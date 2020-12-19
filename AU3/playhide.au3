@@ -96,25 +96,28 @@ _SetTheme("DarkPlayHide")
 
 #include <playhide\checkupdate.au3>
 
-If checkTAP_Interface($AppName) = false Or Not FileExists($LoginFile) then
+If checkTAP_Interface($AppName) = false Then
    If Not IsAdmin() Then
 			_Metro_MsgBox(0, $String_error, $String_start_msg)
-						Exit
-					 else
-			If Not FileExists($LoginFile) And $ServerMode = 0 then
-#include <playhide\auth.au3>
-				EndIf
-#include <playhide\setup.au3>
+			Exit
+		 else
+			#include <playhide\setup.au3>
+		 EndIf
 
-		else
+	  If Not FileExists($LoginFile) And $ServerMode = 0 Then
+		 #include <playhide\auth.au3>
+	  EndIf
+
 		if _Singleton($Appname, 1) = 0 Then
 	      	_Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_start_msg2)
     		Exit
-		EndIf
+		 EndIf
+
 		If ProcessExists("openvpn.exe") Then
        		_Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_start_msg3)
    			Exit
-		EndIf
+		 EndIf
+
 			Local $hTimer = TimerInit()
 			$Form1 = _Metro_CreateGUI($AppName, 250, 200, -1, -1, true,false)
 			$Control_Buttons = _Metro_AddControlButtons(False,False,True,False,True)
@@ -147,7 +150,6 @@ If checkTAP_Interface($AppName) = false Or Not FileExists($LoginFile) then
 
 #include <playhide\tray.au3>
 #include <playhide\autoconnect.au3>
-EndIf
 
 While 1
 #include <playhide\switches_ui.au3>
