@@ -81,7 +81,13 @@ Global $ConnectSetup = @ComSpec & " /c " & 'bin\openvpn.exe ' & $Params & ' ' & 
 Else
 Global $Params = "--client --nobind --resolv-retry infinite --persist-key --persist-tun --auth-nocache --remote-cert-tls server --mute-replay-warnings " & $ParamsLog
 Global $ConnectSetup = @ComSpec & " /c " & 'bin\openvpn.exe ' & $Params & ' --remote ' & $ServerIP & ' ' & $ServerPort & ' --ca .\certs\' & $ServerCA & ' --dev ' & $ServerDev & ' --proto ' & $ServerProto & ' --config .\config\' & $ServerConfig & ' --auth-user-pass ' & $LoginFile
+
+if $CustomServerListEnabled = 0 Then
+get_servers()
 EndIf
+
+EndIf
+
 Global $Connect = $ConnectSetup & ' --dev-node "' & $AppName & '"'
 Global $ChatSetting = IniRead($SettingsFile, "Settings", "Chat", "")
 Global $AuthSetting = IniRead($SettingsFile, "Settings", "Auth", "")

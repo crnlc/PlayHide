@@ -180,3 +180,6 @@
 
 ### Version 5.9
 - Setup Process improved (removed PowerShell Helper Script)
+
+### Version 6.0
+- Update Servers from new API

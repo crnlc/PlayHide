@@ -213,3 +213,17 @@ Case $ButtonServerOK
 EndSwitch
 WEnd
 EndFunc
+
+Func get_servers()
+   $new = ".\tmp\servers.ini"
+   $old = ".\config\servers.ini"
+   $url = "http://api.playhide.eu/servers"
+
+   	Local $dl = InetGet($url,$new, $INET_FORCERELOAD)
+
+   If $dl Then
+   FileCopy($new, $old, 1)
+   FileDelete($new)
+   EndIf
+
+EndFunc
