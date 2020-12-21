@@ -88,6 +88,18 @@ Func _IPDetails()
     Return SetError($aReturn[0] = 0, 0, $aReturn)
  EndFunc
 
+ Func GET_MAC()
+    Local $oWMIService = ObjGet('winmgmts:\\' & '.' & '\root\cimv2')
+    Local $oColItems = $oWMIService.ExecQuery('Select * From Win32_NetworkAdapter Where NetConnectionID="'& $AppName & '" ', 'WQL', 0x30), $aReturn[5] = [0]
+    If IsObj($oColItems) Then
+        For $oObjectItem In $oColItems
+            If $oObjectItem.MACAddress(0) Then
+                $aReturn = $oObjectItem.MACAddress(0)
+            EndIf
+        Next
+    EndIf
+    Return $aReturn
+ EndFunc
 
  Func checkTAP_Interface($AppName)
     $DevResult = Run(@ComSpec & ' /c netsh interface show interface name="' & $AppName & '"', "", @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
@@ -117,25 +129,6 @@ Func RestartScript()
     EndIf
     Exit
  EndFunc
-
-Func GET_MAC($_MACsIP)
-    Local $_MAC,$_MACSize
-    Local $_MACi,$_MACs,$_MACr,$_MACiIP
-    $_MAC = DllStructCreate("byte[6]")
-    $_MACSize = DllStructCreate("int")
-    DllStructSetData($_MACSize,1,6)
-    $_MACr = DllCall ("Ws2_32.dll", "int", "inet_addr", "str", $_MACsIP)
-    $_MACiIP = $_MACr[0]
-    $_MACr = DllCall ("iphlpapi.dll", "int", "SendARP", "int", $_MACiIP, "int", 0, "ptr", DllStructGetPtr($_MAC), "ptr", DllStructGetPtr($_MACSize))
-    $_MACs  = ""
-    For $_MACi = 0 To 5
-    If $_MACi Then $_MACs = $_MACs & ":"
-        $_MACs = $_MACs & Hex(DllStructGetData($_MAC,1,$_MACi+1),2)
-    Next
-    DllClose($_MAC)
-    DllClose($_MACSize)
-    Return $_MACs
-EndFunc
 
 Func _RandomText($length)
     $text = ""
@@ -227,3 +220,16 @@ Func get_servers()
    EndIf
 
 EndFunc
+
+
+Func valid_ipv4($ip)
+$pattern = StringRegExp($ip, "(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})")
+
+    If $pattern == 1 Then
+	   Return True
+	Else
+	  Return False
+   EndIf
+
+EndFunc
+

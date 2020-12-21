@@ -7,14 +7,11 @@ Switch $nMsg
 			ShellExecute("https://playhide.eu")
 
 	Case $LabelShowIP
-			$aArray = _IPDetails()
-		If $aArray[1] Then
-			$MAC = GET_MAC($sData)
+			$MAC = GET_MAC()
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, "MAC: " & $MAC)
 			ClipPut($MAC)
 			_Metro_MsgBox($MB_SYSTEMMODAL, $String_info, $String_mac_copy)
 			_GUIDisable($Form1)
-		EndIf
 
 	Case $ButtonConnect
 			Run($Connect, "", @SW_HIDE)
@@ -56,7 +53,7 @@ Switch $nMsg
 						LanguageList()
 					 Case "1"
 						$aArray = _IPDetails()
-					 If $aArray[1] Then
+					 If valid_ipv4($aArray[1]) Then
 						run(".\bin\network-scan.exe " & $aArray[1])
 					 EndIf
 				Case "2"
@@ -72,11 +69,11 @@ Switch $MenuSelect
 			LanguageList()
 	Case "2"
 			$aArray = _IPDetails()
-		 If $aArray[1] Then
+		 If valid_ipv4($aArray[1]) Then
 			run(".\bin\network-scan.exe " & $aArray[1])
 		 EndIf
 	Case "3"
-			ShellExecute("http://chat.vpn")
+			ShellExecute("https://discord.gg/AnHre4DQgc")
 	Case "4"
 			ProcessClose("openvpn.exe")
 			_Metro_GUIDelete($Form1)

@@ -117,6 +117,8 @@ If checkTAP_Interface($AppName) = false Then
 		if _Singleton($Appname, 1) = 0 Then
 	      	_Metro_MsgBox($MB_SYSTEMMODAL, $String_error, $String_start_msg2)
     		Exit
+		 Else
+			    ProcessClose("openvpn.exe")
 		 EndIf
 
 		If ProcessExists("openvpn.exe") Then

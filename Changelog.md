@@ -183,3 +183,7 @@
 
 ### Version 6.0
 - Update Servers from new API
+
+### Version 6.1
+- Bugfixes
+- Chat -> Discord Channel
