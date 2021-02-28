@@ -187,3 +187,7 @@
 ### Version 6.1
 - Bugfixes
 - Chat -> Discord Channel
+
+### Version 6.2-6.3
+- EN language updated THX to Lesani_AUT
+- Update to OpenVPN Binaries 2.5.1
