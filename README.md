@@ -14,12 +14,12 @@ PlayHide VPN is an open source alternative to VPN tunnel services like Hamachi a
 - No logging
 - No spyware
 - No account or registration required 
-- Autmatic updates
+- Automatic updates
 - One click to connect
 - No port forwarding needed (as client)
 - Switch between other servers / locations
 - DNS hostname support with domain suffix (.vpn)
-- Completly open source including OpenVPN
+- Completely open source including OpenVPN
 
 ## Features
 - Play your games in LAN mode with your friends
@@ -47,8 +47,8 @@ _*Planned freatures may or may not be added_
 2. Run PlayHide.exe as admin and install 
 3. Setup will now install the Tap network driver and create a shortcut on your desktop*
 4. Open PlayHide and click *Connect* to join a VPN network
-4.1. You can choose your desired server in the servers menu
-4.2. You can see all connected clients in the network menu
+   - You can choose your desired server in the servers menu
+   - You can see all connected clients in the network menu
 
 _*PlayHide needs the Tap network driver, otherwise it will not work_
 
@@ -58,17 +58,17 @@ _*PlayHide needs the Tap network driver, otherwise it will not work_
 #### Server:
 1. Open up Settings.ini and change _ServerMode=0_ to _1_
 2. Forward port 1400 as UDP in your router*
-2.2.  You can change the port in the Settings.ini
-2.3. Make sure your firewall and anti virus are not blocking the port
+    - You can change the port in the Settings.ini
+    - Make sure your firewall and anti virus are not blocking the port
 3. Start PlayHide
-3.1. The Server is now running. Keep in mind: you don't need to run a client on this machine to be in the VPN since you *are* the VPN
+    - The Server is now running. Keep in mind: you don't need to run a client on this machine to be in the VPN since you *are* the VPN
 
 Notes: You might want to set up a DynDNS if you don't want to change the IP address in the clients  with every IP change. 
 
 #### Client: 
 1. Open up server_custom.ini_example
 2. Configure it with your Domain/DynDNS/IP and port
-2.2. If you are running your own OpenVPN certificates, make sure to add them in the config  
+    - If you are running your own OpenVPN certificates, make sure to add them in the config  
 3. Copy your configuration into the server.ini
 4. Start PlayHide, select your Server and hit *Connect*
 
@@ -82,20 +82,20 @@ Notes: You might want to set up a DynDNS if you don't want to change the IP addr
 
 ## Having Issues?
 - Make sure your 3rd party firewall get access to Port 1400 as UDP
-- The metric must be 1 on the Tap interface. This is normally set by the installer script.
-- Having multiple network interfaces installed can create driver issues. Please check your device manager for issues, if you don's see the PlayHide VPN adapter under network adapters.
+- The metric must be 1 on the Tap interface. This is normally set by the installer script
+- Having multiple network interfaces installed can create driver issues. Please check your device manager for issues, if you don's see the PlayHide VPN adapter under network adapters
 - Make sure only one ethernet & no other VPN client are running (Metric conflict)
-- The connection limit per server is currently 254 clients.
+- The connection limit per server currently is 254 clients
 - Other issues? - Contact me on Discord
 
 ## Known Issues
-- Linux client install and run script is not formatted in the right way.
-- Linux client uses tap3 as the standard interface. It does not look if its available or look for other interfaces.
-- Having multiple VPN interfaces seem to create driver issues. Disabling other VPN network interfaces in the device manager fixes that.
-- The Tap driver uninstaller seems to fail sometimes. Make sure you run it as administrator. If this does not work, deinstall the driver from the device manager.
+- Linux client install and run script is not formatted in the right way
+- Linux client uses tap3 as the standard interface. It does not look if its available or look for other interfaces
+- Having multiple VPN interfaces seem to create driver issues. Disabling other VPN network interfaces in the device manager fixes that
+- The Tap driver uninstaller seems to fail sometimes. Make sure you run it as administrator. If this does not work, deinstall the driver from the device manager
 
 
-## ![Changelogs](Changelog.md)
+## ![Changelog](Changelog.md)
 
 ## Contact
 #### Discord: https://discord.gg/zrZ5ynF
