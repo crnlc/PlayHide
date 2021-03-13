@@ -191,3 +191,6 @@
 ### Version 6.2-6.3
 - EN language updated THX to Lesani_AUT
 - Update to OpenVPN Binaries 2.5.1
+
+### Version 6.4
+- Uninstall added
