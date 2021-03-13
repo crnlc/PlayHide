@@ -76,8 +76,9 @@ Notes: You might want to set up a DynDNS if you don't want to change the IP addr
 
 ## Deinstalling PlayHide
 1. Open up your PlayHide directory
-2. Navigate to driver and your corresponding Windows version
+2. Navigate to /driver and your corresponding Windows version
 3. Run _Uninstall_Adapter.cmd_ as administrator
+    - If you blocked SMB, go to /tools and run Unblock_SMB.cmd as admin.
 4. Delete everything else
 
 ## Having Issues?
