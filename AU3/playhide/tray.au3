@@ -8,7 +8,7 @@
         Local $iLogin = ""
     EndIf
     If $ChatSetting >0 then
-        Local $iOpenChat = TrayCreateItem("Chat")
+        Local $iOpenChat = TrayCreateItem("Discord")
         TrayItemSetState ($iOpenChat, $TRAY_ENABLE)
     Else
         Local $iOpenChat = ""

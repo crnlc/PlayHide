@@ -23,7 +23,7 @@ Opt("TrayMenuMode",3)
 $AppName = "PlayHide VPN"
 $UpdaterVersionFile = ".\version.ini"
 Global $ReadVersion = IniRead($UpdaterVersionFile, "Version", "Version", "")
-
+Global $DiscordURL = "https://discord.gg/q6dRzzm"
 Global $SettingsFile = @ScriptDir & "\Settings.ini"
 Global $Language = IniRead($SettingsFile, "Settings", "Language", "")
 Global $CheckUpdateSetting = IniRead($SettingsFile, "Settings", "CheckUpdate", "")
@@ -32,6 +32,7 @@ Global $ServerMode = IniRead($SettingsFile, "Settings", "ServerMode", "")
 Global $LogSetting = IniRead($SettingsFile, "Settings", "Log", "")
 Global $LanguageFile = @ScriptDir & "\lang\" & $Language & ".ini"
 Global $CustomServerListEnabled = IniRead($SettingsFile, "Settings", "CustomList", "")
+Global $Uninstall = IniRead($SettingsFile, "Settings", "Uninstall", "")
 
 if $CustomServerListEnabled = 1 Then
 Global $ServerList = @ScriptDir & "\config\servers_custom.ini"
@@ -101,6 +102,16 @@ TraySetIcon($sFile)
 _SetTheme("DarkPlayHide")
 
 #include <playhide\checkupdate.au3>
+
+
+if $Uninstall = 1 Then
+      If Not IsAdmin() Then
+			_Metro_MsgBox(0, $String_error, $String_start_msg)
+	  Exit
+   Else
+   #include <playhide\uninstall.au3>
+EndIf
+EndIf
 
 If checkTAP_Interface($AppName) = false Then
    If Not IsAdmin() Then

@@ -51,3 +51,5 @@ Global $String_autoconnect_info2 = IniRead($LanguageFile, "Strings", "autoconnec
 Global $String_network = IniRead($LanguageFile, "Strings", "network", "")
 Global $String_scanner_msg = IniRead($LanguageFile, "Strings", "scanner_msg", "")
 Global $String_mac_copy = IniRead($LanguageFile, "Strings", "mac_copy", "")
+Global $String_uninstall = IniRead($LanguageFile, "Strings", "uninstall", "")
+Global $String_uninstall_msg = IniRead($LanguageFile, "Strings", "uninstall_msg", "")

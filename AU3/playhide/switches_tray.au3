@@ -5,9 +5,7 @@ Switch TrayGetMsg()
 			Exit
 
 	Case $iOpenChat
-		If $ChatSetting >0 then
-			ShellExecute("http://chat.vpn")
-		EndIf
+			ShellExecute($DiscordURL)
 
 	Case $iWebsite
 			ShellExecute("https://playhide.eu")

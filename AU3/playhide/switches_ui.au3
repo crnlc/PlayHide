@@ -43,7 +43,7 @@ Switch $nMsg
 		if $ServerMode = 1 Then
 			Local $MenuButtonsArray[5] = [$String_language, $String_network, $String_close]
 			Else
-			Local $MenuButtonsArray[5] = ["Servers", $String_language, $String_network, "Chat", $String_close]
+			Local $MenuButtonsArray[5] = ["Servers", $String_language, $String_network, "Discord", $String_close]
 			EndIf
 			Local $MenuSelect = _Metro_MenuStart($Form1, 150, $MenuButtonsArray)
 
@@ -73,7 +73,7 @@ Switch $MenuSelect
 			run(".\bin\network-scan.exe " & $aArray[1])
 		 EndIf
 	Case "3"
-			ShellExecute("https://discord.gg/AnHre4DQgc")
+			ShellExecute($DiscordURL)
 	Case "4"
 			ProcessClose("openvpn.exe")
 			_Metro_GUIDelete($Form1)
